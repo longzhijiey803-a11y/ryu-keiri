@@ -2,26 +2,77 @@
 @tailwind components;
 @tailwind utilities;
 
+/*
+ * Ryu Keiri デザイントークン（CSS 変数）
+ * 正本: docs/DESIGN.md §A-5。色は "R G B" 三値で保持し Tailwind の
+ * rgb(var(--x) / <alpha-value>) と連携する。現状はライトテーマ単一（業務SaaS / §A-0）。
+ */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: 246 247 249; /* #F6F7F9 アプリ背景 */
+  --surface: 255 255 255; /* #FFFFFF 面 */
+  --border: 229 231 235; /* #E5E7EB 罫線 */
+  --foreground: 17 24 39; /* #111827 本文 */
+  --muted: 243 244 246; /* #F3F4F6 弱い面 */
+  --muted-foreground: 107 114 128; /* #6B7280 補助テキスト */
+  --primary: 15 118 110; /* #0F766E */
+  --primary-foreground: 255 255 255;
+  --sidebar: 36 39 46; /* #24272E ダークナビ */
+  --sidebar-foreground: 209 213 219; /* #D1D5DB */
+  --sidebar-active: 58 61 69; /* #3A3D45 */
+  --success: 22 163 74; /* #16A34A */
+  --warning: 217 119 6; /* #D97706 */
+  --danger: 220 38 38; /* #DC2626 */
+  --info: 37 99 235; /* #2563EB */
+
+  /* 日本語UIに適したフォント（実務向けで読みやすい / ビルド時ネットワーク非依存） */
+  --font-sans: "Inter", -apple-system, BlinkMacSystemFont, "Hiragino Sans",
+    "Hiragino Kaku Gothic ProN", "Noto Sans JP", "Yu Gothic UI", "Yu Gothic",
+    Meiryo, system-ui, sans-serif;
+  --font-mono: "SFMono-Regular", ui-monospace, Menlo, Consolas,
+    "Liberation Mono", monospace;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+@layer base {
+  * {
+    @apply border-border;
   }
-}
-
-body {
-  color: var(--foreground);
-  background: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
+  html {
+    -webkit-text-size-adjust: 100%;
+  }
+  body {
+    @apply bg-background text-foreground antialiased;
+    font-family: var(--font-sans);
+    font-feature-settings: "palt"; /* 日本語の詰め */
+    text-rendering: optimizeLegibility;
+  }
+  /* 金額・コード等は等幅＋桁揃え */
+  .tabular {
+    font-feature-settings: normal;
+    font-variant-numeric: tabular-nums;
+  }
 }
 
 @layer utilities {
   .text-balance {
     text-wrap: balance;
+  }
+  /* ページ共通の横パディング（§A-5: 24px） */
+  .page-px {
+    @apply px-page;
+  }
+  /* 控えめな実務向けスクロールバー */
+  .scrollbar-thin {
+    scrollbar-width: thin;
+    scrollbar-color: rgb(var(--border)) transparent;
+  }
+  .scrollbar-thin::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+  .scrollbar-thin::-webkit-scrollbar-thumb {
+    background-color: rgb(var(--border));
+    border-radius: 9999px;
+    border: 3px solid transparent;
+    background-clip: content-box;
   }
 }
