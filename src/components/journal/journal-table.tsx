@@ -25,7 +25,7 @@ import { AccountPicker } from "./account-picker";
 
 /**
  * 借方/貸方 の代表行（先頭行）を「AIピッカー」で表示する。
- * - AI推測フラグの付いた明細は「🤖 推測: 〜」+ 斜体 + 下点線
+ * - AI推測フラグの付いた明細は「AI推測: 〜」+ 斜体 + 下点線
  * - クリックで勘定科目セレクトを開いて修正できる
  */
 function AccountCell({

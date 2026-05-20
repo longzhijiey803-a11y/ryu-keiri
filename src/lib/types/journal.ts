@@ -80,7 +80,7 @@ export interface JournalLine {
   project: string | null;
   /**
    * AI が推測した勘定科目で、人間の確認待ちであるか。
-   * true の間は表示上「🤖 推測:」ラベル＋斜体＋下点線で警告表示する。
+   * true の間は表示上「AI推測:」ラベル＋斜体＋下点線で警告表示する。
    */
   ai_predicted?: boolean;
 }

@@ -46,9 +46,6 @@ export function JournalStatusBadge({
       )}
     >
       <span className={cn("size-1.5 rounded-full", c.dot)} aria-hidden />
-      {status === "ai_predicted" && (
-        <span aria-hidden>🤖</span>
-      )}
       {JOURNAL_ENTRY_STATUS_LABEL[status]}
     </span>
   );

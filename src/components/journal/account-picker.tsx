@@ -20,7 +20,7 @@ import {
 /**
  * 勘定科目を選び直すためのトリガ＋ドロップダウン。
  * - 通常モード: 科目名のみ表示（クリックでメニュー）
- * - 推測モード（aiPredicted=true）: "🤖 推測: <科目>" を斜体＋下点線で表示
+ * - 推測モード（aiPredicted=true）: "AI推測: <科目>" を斜体＋下点線で表示
  *   行クリック（詳細ドロワーを開く）には伝播しない。
  */
 export function AccountPicker({
@@ -58,7 +58,7 @@ export function AccountPicker({
                   className="rounded bg-amber-100 px-1.5 py-0.5 text-[10px] font-medium text-amber-800"
                   aria-label="AI推測"
                 >
-                  🤖 推測
+                  AI推測
                 </span>
                 <span className="truncate italic underline decoration-amber-500 decoration-dotted underline-offset-4">
                   {current}
