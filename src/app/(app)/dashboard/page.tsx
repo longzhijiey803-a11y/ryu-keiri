@@ -69,7 +69,7 @@ export default function DashboardPage() {
             sub="経費・支払の承認待ち"
             icon={ClipboardCheck}
             tone="warning"
-            href="/workflow"
+            href="/approvals"
           />
           <KpiCard
             label="未払請求"

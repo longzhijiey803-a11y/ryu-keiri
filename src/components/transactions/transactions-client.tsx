@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import { useRouter } from "next/navigation";
 import { LayoutGrid, Plus, Table2 } from "lucide-react";
 
 import { Button, useToast } from "@/components/ui";
@@ -22,6 +23,7 @@ import type {
 } from "@/lib/types/transaction";
 import {
   JOURNAL_STATUS_LABEL,
+  TRANSACTION_KIND_DIRECTION,
   TRANSACTION_STATUS_LABEL,
 } from "@/lib/types/transaction";
 import { TransactionFilterBar } from "./transaction-filter-bar";
@@ -79,6 +81,7 @@ function ViewToggle({
 }
 
 export function TransactionsClient() {
+  const router = useRouter();
   const { toast } = useToast();
   const [list, setList] = React.useState<Transaction[]>(TRANSACTIONS);
   const [filter, setFilter] = React.useState<TransactionFilter>(
@@ -98,7 +101,21 @@ export function TransactionsClient() {
     [list, selectedId],
   );
 
+  /**
+   * 行クリック時の遷移ルール。
+   * - 承認待ち（approval）→ /approvals
+   * - 入金待ち / 支払予定（消込対象）→ /reconciliation
+   * - それ以外（下書き / 確認待ち / 完了 / 差戻し）→ 詳細ドロワーを開く（既存挙動）
+   */
   const openDetail = (t: Transaction) => {
+    if (t.status === "approval") {
+      router.push(`/approvals?txn=${t.id}`);
+      return;
+    }
+    if (t.status === "awaiting_deposit" || t.status === "scheduled_payment") {
+      router.push(`/reconciliation?txn=${t.id}`);
+      return;
+    }
     setSelectedId(t.id);
     setDetailOpen(true);
   };
@@ -172,15 +189,25 @@ export function TransactionsClient() {
               }
             : s,
         );
+        // 全員承認した時は取引方向に応じて次ステージへ進める：
+        //   outflow（仕入/経費/支払/給与/税金/固定資産）→ 支払予定
+        //   inflow（売上/入金）→ 入金待ち
+        //   neutral（借入/振替/赤黒）→ 完了
+        const allApproved = approvals.every(
+          (s) => s.status === "approved" || s.status === "skipped",
+        );
+        const dir = TRANSACTION_KIND_DIRECTION[t.kind];
         const nextStatus: TransactionStatus =
           action === "reject"
             ? "rejected"
             : action === "return"
               ? "review"
-              : approvals.every(
-                    (s) => s.status === "approved" || s.status === "skipped",
-                  )
-                ? "done"
+              : allApproved
+                ? dir === "outflow"
+                  ? "scheduled_payment"
+                  : dir === "inflow"
+                    ? "awaiting_deposit"
+                    : "done"
                 : t.status;
         return {
           ...t,
@@ -209,6 +236,72 @@ export function TransactionsClient() {
           : action === "return"
             ? "warning"
             : "error",
+    });
+  };
+
+  /** 取引コメントの編集。投稿者本人のみ呼び出される（フロントで権限制御）。 */
+  const handleEditComment = (
+    txnId: string,
+    commentId: string,
+    body: string,
+  ) => {
+    const now = new Date().toISOString();
+    setList((prev) =>
+      prev.map((t) =>
+        t.id !== txnId
+          ? t
+          : {
+              ...t,
+              comments: t.comments.map((c) =>
+                c.id === commentId ? { ...c, body } : c,
+              ),
+              history: [
+                ...t.history,
+                {
+                  id: `H-${txnId}-${Date.now()}`,
+                  actor: CURRENT_USER,
+                  action: "コメント編集",
+                  at: now,
+                  detail: body.slice(0, 60),
+                },
+              ],
+              updated_at: now,
+            },
+      ),
+    );
+    toast({
+      title: "コメントを更新しました",
+      variant: "success",
+    });
+  };
+
+  /** 取引コメントの削除（モーダル確認後に呼ばれる） */
+  const handleDeleteComment = (txnId: string, commentId: string) => {
+    const now = new Date().toISOString();
+    setList((prev) =>
+      prev.map((t) =>
+        t.id !== txnId
+          ? t
+          : {
+              ...t,
+              comments: t.comments.filter((c) => c.id !== commentId),
+              history: [
+                ...t.history,
+                {
+                  id: `H-${txnId}-${Date.now()}`,
+                  actor: CURRENT_USER,
+                  action: "コメント削除",
+                  at: now,
+                  detail: null,
+                },
+              ],
+              updated_at: now,
+            },
+      ),
+    );
+    toast({
+      title: "コメントを削除しました",
+      variant: "warning",
     });
   };
 
@@ -324,7 +417,11 @@ export function TransactionsClient() {
           onJournalStatusChange={handleJournalStatusChange}
         />
       ) : (
-        <TransactionKanban data={filtered} onCardClick={openDetail} />
+        <TransactionKanban
+          data={filtered}
+          onCardClick={openDetail}
+          onStatusChange={handleStatusChange}
+        />
       )}
 
       <TransactionDetailDrawer
@@ -335,6 +432,8 @@ export function TransactionsClient() {
           if (!o) setSelectedId(null);
         }}
         onAddComment={handleAddComment}
+        onEditComment={handleEditComment}
+        onDeleteComment={handleDeleteComment}
         onApprovalAction={handleApprovalAction}
       />
 

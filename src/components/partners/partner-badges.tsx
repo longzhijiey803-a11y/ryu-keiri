@@ -21,7 +21,7 @@ export function RegNoBadge({ value }: { value: string | null }) {
     );
   }
   return (
-    <span className="inline-flex items-center rounded-full bg-warning/10 px-2 py-0.5 text-xs font-medium text-warning">
+    <span className="inline-flex items-center whitespace-nowrap rounded-full bg-warning/10 px-2 py-0.5 text-xs font-medium text-warning">
       未登録
     </span>
   );

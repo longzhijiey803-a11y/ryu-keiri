@@ -74,6 +74,8 @@ export function TransactionDetailDrawer({
   open,
   onOpenChange,
   onAddComment,
+  onEditComment,
+  onDeleteComment,
   onApprovalAction,
 }: {
   txn: Transaction | null;
@@ -81,6 +83,10 @@ export function TransactionDetailDrawer({
   onOpenChange: (o: boolean) => void;
   /** コメント追加。未指定の場合は drawer ローカル state のみ更新（プレビュー用）。 */
   onAddComment?: (txnId: string, body: string) => void;
+  /** コメント編集。 */
+  onEditComment?: (txnId: string, commentId: string, body: string) => void;
+  /** コメント削除。 */
+  onDeleteComment?: (txnId: string, commentId: string) => void;
   /** 承認ステップへのアクション（承認/差戻し/却下）を親に通知。 */
   onApprovalAction?: (
     txnId: string,
@@ -382,6 +388,27 @@ export function TransactionDetailDrawer({
               <TransactionComments
                 comments={localComments}
                 onAdd={addComment}
+                onEdit={
+                  onEditComment
+                    ? (id, body) => onEditComment(txn.id, id, body)
+                    : (id, body) => {
+                        // フォールバック: drawer ローカルでだけ反映（プレビュー用）
+                        setExtraComments((prev) =>
+                          prev.map((c) =>
+                            c.id === id ? { ...c, body } : c,
+                          ),
+                        );
+                      }
+                }
+                onDelete={
+                  onDeleteComment
+                    ? (id) => onDeleteComment(txn.id, id)
+                    : (id) => {
+                        setExtraComments((prev) =>
+                          prev.filter((c) => c.id !== id),
+                        );
+                      }
+                }
               />
             </TabsContent>
 

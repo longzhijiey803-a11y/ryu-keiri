@@ -33,7 +33,7 @@ function Pill({
   return (
     <span
       className={cn(
-        "inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-xs font-medium leading-none",
+        "inline-flex items-center gap-1.5 whitespace-nowrap rounded-full px-2.5 py-0.5 text-xs font-medium leading-none",
         c.box,
         strike && "line-through",
       )}
@@ -95,7 +95,7 @@ export function PaymentStateBadge({ state }: { state: PaymentState }) {
 
 export function OverdueBadge() {
   return (
-    <span className="inline-flex items-center gap-1 rounded-full bg-danger/10 px-2 py-0.5 text-xs font-medium text-danger">
+    <span className="inline-flex items-center gap-1 whitespace-nowrap rounded-full bg-danger/10 px-2 py-0.5 text-xs font-medium text-danger">
       期限超過
     </span>
   );

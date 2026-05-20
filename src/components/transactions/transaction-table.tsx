@@ -32,6 +32,29 @@ function journalBadgeVariant(s: JournalStatus) {
   return s === "posted" ? "success" : s === "draft" ? "info" : "neutral";
 }
 
+/**
+ * 行アクセント色。要対応の行を一目で見分けられるよう左 2px のカラーバー＋淡背景を付ける。
+ * 優先順位: 期限超過 > 承認待ち > 入金待ち > 支払予定。
+ * 完了 / 差戻し / 下書きはアクセントなし。
+ */
+function transactionRowAccent(t: Transaction): string | undefined {
+  const open = t.status !== "done" && t.status !== "rejected";
+  const overdue =
+    open &&
+    t.due_date != null &&
+    t.due_date < TODAY &&
+    t.status !== "draft";
+
+  if (overdue) return "bg-danger/[0.04] shadow-[inset_3px_0_0_rgb(var(--danger))]";
+  if (t.status === "approval" || t.status === "review")
+    return "bg-warning/[0.04] shadow-[inset_3px_0_0_rgb(var(--warning))]";
+  if (t.status === "awaiting_deposit")
+    return "bg-warning/[0.03] shadow-[inset_3px_0_0_rgb(217_119_6_/_0.7)]";
+  if (t.status === "scheduled_payment")
+    return "bg-info/[0.04] shadow-[inset_3px_0_0_rgb(var(--info))]";
+  return undefined;
+}
+
 function buildColumns(
   onStatusChange: (id: string, s: TransactionStatus) => void,
   onJournalStatusChange: (id: string, s: JournalStatus) => void,
@@ -210,6 +233,7 @@ export function TransactionTable({
       data={data}
       getRowId={(t) => t.id}
       onRowClick={onRowClick}
+      rowClassName={(t) => transactionRowAccent(t)}
       emptyState={
         <EmptyState
           icon={Search}

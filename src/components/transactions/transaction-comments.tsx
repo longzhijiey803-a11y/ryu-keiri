@@ -4,16 +4,22 @@ import * as React from "react";
 import { MessageSquare, Send } from "lucide-react";
 
 import { Avatar, Button, EmptyState } from "@/components/ui";
-import { cn, formatISODateTime } from "@/lib/utils";
-import { CURRENT_USER } from "@/lib/current-user";
+import { CURRENT_USER, CURRENT_USER_ID } from "@/lib/current-user";
 import type { TransactionComment } from "@/lib/types/transaction";
+import { TransactionRowActions } from "./transaction-row-actions";
 
 export interface TransactionCommentsProps {
   comments: TransactionComment[];
-  /** 新規コメントを投稿する。親が state を更新する想定。 */
+  /** 新規コメントを投稿する。 */
   onAdd: (body: string) => void;
+  /** 既存コメントを編集する。 */
+  onEdit?: (id: string, body: string) => void;
+  /** 既存コメントを削除する。 */
+  onDelete?: (id: string) => void;
   /** 投稿者として表示する現在ユーザー（既定は CURRENT_USER） */
   currentUserName?: string;
+  /** 操作権限を持つユーザー ID（既定は CURRENT_USER_ID） */
+  currentUserId?: string;
   /** 直近 N 秒以内のコメントを「新着」としてハイライト */
   freshWindowSec?: number;
 }
@@ -23,26 +29,28 @@ export interface TransactionCommentsProps {
  * - 最新を上に並べる
  * - 新着（直近 60 秒）は淡い primary 背景でハイライト
  * - 入力欄は複数行。Shift+Enter で送信、Enter で改行
+ * - 自分の投稿のみホバーで編集 / 削除アイコンが出現
+ * - 多数件でも一覧はスクロール可能（max-h）
  */
 export function TransactionComments({
   comments,
   onAdd,
+  onEdit,
+  onDelete,
   currentUserName = CURRENT_USER.name,
+  currentUserId = CURRENT_USER_ID,
   freshWindowSec = 60,
 }: TransactionCommentsProps) {
   const [draft, setDraft] = React.useState("");
   const taRef = React.useRef<HTMLTextAreaElement | null>(null);
-  // SSR/CSR で時刻がズレてハイドレーション不一致を起こさないよう、マウント後のみ「新着」判定する
+  // SSR/CSR で時刻がズレてハイドレーション不一致を起こさないよう、マウント後のみ「新着」判定
   const [now, setNow] = React.useState<number | null>(null);
   React.useEffect(() => {
     setNow(Date.now());
   }, []);
 
   const sorted = React.useMemo(
-    () =>
-      [...comments].sort((a, b) =>
-        b.created_at.localeCompare(a.created_at),
-      ),
+    () => [...comments].sort((a, b) => b.created_at.localeCompare(a.created_at)),
     [comments],
   );
 
@@ -51,7 +59,6 @@ export function TransactionComments({
     if (!body) return;
     onAdd(body);
     setDraft("");
-    // フォーカスを保ち連続投稿しやすく
     taRef.current?.focus();
   };
 
@@ -65,44 +72,27 @@ export function TransactionComments({
 
   return (
     <div className="flex flex-col gap-4">
-      {/* 一覧 */}
+      {/* 一覧（スクロール可能） */}
       {sorted.length === 0 ? (
         <EmptyState icon={MessageSquare} title="コメントはありません" compact />
       ) : (
-        <ul className="space-y-2">
+        <ul className="max-h-[420px] space-y-1 overflow-y-auto pr-1">
           {sorted.map((c) => {
             const fresh =
               now != null &&
               (now - new Date(c.created_at).getTime()) / 1000 <=
                 freshWindowSec;
+            const canEdit =
+              c.author.id === currentUserId && (!!onEdit || !!onDelete);
             return (
-              <li
+              <TransactionRowActions
                 key={c.id}
-                className={cn(
-                  "flex gap-3 rounded-md border border-transparent px-2 py-2 transition-colors",
-                  fresh && "border-primary/30 bg-primary/[0.04]",
-                )}
-              >
-                <Avatar name={c.author.name} size="sm" />
-                <div className="min-w-0 flex-1">
-                  <p className="flex items-center gap-2 text-sm">
-                    <span className="font-medium text-foreground">
-                      {c.author.name}
-                    </span>
-                    <span className="text-xs text-muted-foreground tabular">
-                      {formatISODateTime(c.created_at)}
-                    </span>
-                    {fresh && (
-                      <span className="rounded-full bg-primary/10 px-1.5 py-0.5 text-[10px] font-medium text-primary">
-                        新着
-                      </span>
-                    )}
-                  </p>
-                  <p className="mt-1 whitespace-pre-wrap break-words text-sm text-foreground">
-                    {c.body}
-                  </p>
-                </div>
-              </li>
+                comment={c}
+                canEdit={canEdit}
+                fresh={fresh}
+                onSave={(id, body) => onEdit?.(id, body)}
+                onDelete={(id) => onDelete?.(id)}
+              />
             );
           })}
         </ul>

@@ -128,7 +128,7 @@ export function AlertList({
                     <p className="flex flex-wrap items-center gap-1.5 text-sm font-medium text-foreground">
                       <span
                         className={cn(
-                          "inline-flex items-center rounded-full px-1.5 py-0.5 text-[10px] font-medium",
+                          "inline-flex items-center whitespace-nowrap rounded-full px-1.5 py-0.5 text-[10px] font-medium",
                           a.severity === "danger" &&
                             "bg-danger/10 text-danger",
                           a.severity === "warning" &&

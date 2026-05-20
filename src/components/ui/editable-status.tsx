@@ -46,7 +46,7 @@ export function EditableStatus<T extends string>({
           <button
             type="button"
             title={title}
-            className="inline-flex items-center gap-1 rounded-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            className="inline-flex items-center gap-1 whitespace-nowrap rounded-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
           >
             {currentNode}
             <ChevronDown className="size-3 text-muted-foreground" />

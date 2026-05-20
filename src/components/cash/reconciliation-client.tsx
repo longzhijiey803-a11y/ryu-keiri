@@ -17,7 +17,7 @@ function MatchChip({ ok, label }: { ok: boolean; label: string }) {
   return (
     <span
       className={cn(
-        "inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs",
+        "inline-flex items-center gap-1 whitespace-nowrap rounded-full px-2 py-0.5 text-xs",
         ok ? "bg-success/10 text-success" : "bg-muted text-muted-foreground",
       )}
     >

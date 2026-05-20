@@ -2,11 +2,13 @@
 
 import { CalendarClock, Paperclip } from "lucide-react";
 
-import { Avatar } from "@/components/ui";
+import { Avatar, EditableStatus } from "@/components/ui";
 import { cn, daysBetweenISO, formatISODate, formatJPY } from "@/lib/utils";
 import {
   TRANSACTION_KIND_DIRECTION,
+  TRANSACTION_STATUSES,
   type Transaction,
+  type TransactionStatus,
 } from "@/lib/types/transaction";
 import { TODAY } from "@/lib/types/invoice";
 import {
@@ -17,9 +19,12 @@ import {
 export function TransactionCard({
   txn,
   onClick,
+  onStatusChange,
 }: {
   txn: Transaction;
   onClick: (t: Transaction) => void;
+  /** カード上で直接ステータスを変更する（kanban で使用）。未指定なら静的バッジ表示。 */
+  onStatusChange?: (id: string, status: TransactionStatus) => void;
 }) {
   return (
     <button
@@ -54,7 +59,19 @@ export function TransactionCard({
       </p>
 
       <div className="mt-3 flex items-center justify-between">
-        <TransactionStatusBadge status={txn.status} />
+        {onStatusChange ? (
+          <EditableStatus<TransactionStatus>
+            title="ステータスを変更"
+            current={txn.status}
+            onChange={(v) => onStatusChange(txn.id, v)}
+            options={TRANSACTION_STATUSES.map((s) => ({
+              value: s,
+              render: <TransactionStatusBadge status={s} />,
+            }))}
+          />
+        ) : (
+          <TransactionStatusBadge status={txn.status} />
+        )}
         <div className="flex items-center gap-2 text-xs text-muted-foreground">
           {txn.attachments.length > 0 && (
             <span className="inline-flex items-center gap-0.5">

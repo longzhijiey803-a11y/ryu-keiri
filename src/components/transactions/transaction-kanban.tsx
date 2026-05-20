@@ -12,9 +12,11 @@ import { TransactionCard } from "./transaction-card";
 export function TransactionKanban({
   data,
   onCardClick,
+  onStatusChange,
 }: {
   data: Transaction[];
   onCardClick: (t: Transaction) => void;
+  onStatusChange: (id: string, status: TransactionStatus) => void;
 }) {
   const grouped = groupByStatus(data);
 
@@ -47,6 +49,7 @@ export function TransactionKanban({
                       key={t.id}
                       txn={t}
                       onClick={onCardClick}
+                      onStatusChange={onStatusChange}
                     />
                   ))
                 )}
