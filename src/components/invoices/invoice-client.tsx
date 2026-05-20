@@ -17,6 +17,7 @@ import {
   type InvoiceFilter,
   type InvoiceStatus,
   type IssuedStatus,
+  type Payment,
   type PaymentState,
   type ReceivedStatus,
 } from "@/lib/types/invoice";
@@ -85,6 +86,25 @@ export function InvoiceClient({
     });
   };
 
+  /** 請求書詳細から直接入金を記録する。残額が0なら自動で paid に。 */
+  const handleAddPayment = (id: string, payment: Payment) => {
+    setList((prev) =>
+      prev.map((i) => {
+        if (i.id !== id) return i;
+        const payments = [...i.payments, payment];
+        const paid = payments.reduce((s, p) => s + p.amount, 0);
+        const next: Invoice = {
+          ...i,
+          payments,
+          updated_at: nowISO(),
+          payment_state:
+            paid >= i.total ? "paid" : paid > 0 ? "partial" : i.payment_state,
+        };
+        return next;
+      }),
+    );
+  };
+
   const handlePaymentStateChange = (id: string, state: PaymentState) => {
     setList((prev) =>
       prev.map((i) =>
@@ -129,6 +149,7 @@ export function InvoiceClient({
           setOpen(o);
           if (!o) setSelectedId(null);
         }}
+        onAddPayment={handleAddPayment}
       />
     </>
   );

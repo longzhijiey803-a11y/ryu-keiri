@@ -2,41 +2,61 @@
 
 import * as React from "react";
 import type { ColumnDef } from "@tanstack/react-table";
-import { Paperclip, Search } from "lucide-react";
+import { Check, Paperclip, Search } from "lucide-react";
 
-import { Avatar, DataTable, EditableStatus, EmptyState } from "@/components/ui";
+import {
+  Avatar,
+  Button,
+  DataTable,
+  EditableStatus,
+  EmptyState,
+} from "@/components/ui";
 import { formatISODate, formatJPY } from "@/lib/utils";
-import { lineSummary, primaryValue } from "@/lib/journal-data";
+import { ACCOUNTS, lineSummary, primaryValue } from "@/lib/journal-data";
 import {
   JOURNAL_ENTRY_STATUSES,
   type JournalEntry,
   type JournalEntryStatus,
+  type JournalSide,
 } from "@/lib/types/journal";
 import { TAX_CATEGORY_LABEL } from "@/lib/types/transaction";
 import { JournalStatusBadge } from "./journal-badges";
+import { AccountPicker } from "./account-picker";
 
+/**
+ * 借方/貸方 の代表行（先頭行）を「AIピッカー」で表示する。
+ * - AI推測フラグの付いた明細は「🤖 推測: 〜」+ 斜体 + 下点線
+ * - クリックで勘定科目セレクトを開いて修正できる
+ */
 function AccountCell({
   entry,
   side,
+  onAccountChange,
 }: {
   entry: JournalEntry;
-  side: "debit" | "credit";
+  side: JournalSide;
+  onAccountChange: (entryId: string, lineId: string, code: string) => void;
 }) {
-  const s = lineSummary(entry.lines, side);
+  const lines = entry.lines.filter((l) => l.side === side);
+  const head = lines[0];
+  if (!head) {
+    return <span className="text-muted-foreground/50">—</span>;
+  }
   return (
-    <span className="block max-w-[160px] truncate text-foreground">
-      {s.label}
-      {s.extra > 0 && (
-        <span className="ml-1 text-xs text-muted-foreground">
-          他{s.extra}
-        </span>
-      )}
-    </span>
+    <AccountPicker
+      current={head.account_name}
+      accounts={ACCOUNTS}
+      aiPredicted={!!head.ai_predicted}
+      extraCount={lines.length - 1}
+      onChange={(code) => onAccountChange(entry.id, head.id, code)}
+    />
   );
 }
 
 function buildColumns(
   onStatusChange: (id: string, s: JournalEntryStatus) => void,
+  onAccountChange: (entryId: string, lineId: string, code: string) => void,
+  onConfirm: (entryId: string) => void,
 ): ColumnDef<JournalEntry, unknown>[] {
   return [
   {
@@ -73,7 +93,13 @@ function buildColumns(
     id: "debit_account",
     header: "借方勘定科目",
     accessorFn: (e) => lineSummary(e.lines, "debit").label,
-    cell: ({ row }) => <AccountCell entry={row.original} side="debit" />,
+    cell: ({ row }) => (
+      <AccountCell
+        entry={row.original}
+        side="debit"
+        onAccountChange={onAccountChange}
+      />
+    ),
   },
   {
     id: "debit_total",
@@ -88,7 +114,13 @@ function buildColumns(
     id: "credit_account",
     header: "貸方勘定科目",
     accessorFn: (e) => lineSummary(e.lines, "credit").label,
-    cell: ({ row }) => <AccountCell entry={row.original} side="credit" />,
+    cell: ({ row }) => (
+      <AccountCell
+        entry={row.original}
+        side="credit"
+        onAccountChange={onAccountChange}
+      />
+    ),
   },
   {
     id: "credit_total",
@@ -191,6 +223,25 @@ function buildColumns(
       </span>
     ),
   },
+  {
+    id: "actions",
+    header: "",
+    enableSorting: false,
+    meta: { align: "right" },
+    cell: ({ row }) =>
+      row.original.status === "ai_predicted" ? (
+        <div onClick={(e) => e.stopPropagation()}>
+          <Button
+            size="sm"
+            variant="primary"
+            onClick={() => onConfirm(row.original.id)}
+            title="この AI 推測仕訳を確定する"
+          >
+            <Check /> 確定
+          </Button>
+        </div>
+      ) : null,
+  },
   ];
 }
 
@@ -198,14 +249,18 @@ export function JournalTable({
   data,
   onRowClick,
   onStatusChange,
+  onAccountChange,
+  onConfirm,
 }: {
   data: JournalEntry[];
   onRowClick: (e: JournalEntry) => void;
   onStatusChange: (id: string, status: JournalEntryStatus) => void;
+  onAccountChange: (entryId: string, lineId: string, code: string) => void;
+  onConfirm: (entryId: string) => void;
 }) {
   const columns = React.useMemo(
-    () => buildColumns(onStatusChange),
-    [onStatusChange],
+    () => buildColumns(onStatusChange, onAccountChange, onConfirm),
+    [onStatusChange, onAccountChange, onConfirm],
   );
   return (
     <DataTable
@@ -213,6 +268,11 @@ export function JournalTable({
       data={data}
       getRowId={(e) => e.id}
       onRowClick={onRowClick}
+      rowClassName={(e) =>
+        e.status === "ai_predicted"
+          ? "bg-amber-50 hover:bg-amber-100/70"
+          : undefined
+      }
       emptyState={
         <EmptyState
           icon={Search}

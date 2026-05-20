@@ -53,47 +53,71 @@ export const trend: { month: string; sales: number; expenses: number }[] = [
 ];
 
 export type Severity = "danger" | "warning" | "info";
-export const alerts: {
+
+export type AlertType =
+  | "overdue_payment"
+  | "overdue_receivable"
+  | "pending_close"
+  | "cash_warning"
+  | "master_data";
+
+export interface AlertItem {
   id: string;
+  type: AlertType;
   severity: Severity;
-  title: string;
-  detail: string;
-  time: string;
-}[] = [
+  /** 短い見出し */
+  label: string;
+  /** 詳細メッセージ */
+  message: string;
+  /** 対象日 / 表示用 */
+  date: string;
+  /** 紐づく取引/請求書/勘定の ID。クエリ用 */
+  relatedId?: string;
+}
+
+export const alerts: AlertItem[] = [
   {
     id: "AL-01",
+    type: "overdue_payment",
     severity: "danger",
-    title: "支払期限を超過しています",
-    detail: "買掛 INV-2042 / 株式会社サンプル商事 ¥286,000（期限を3日超過）",
-    time: "本日",
+    label: "支払期限を超過しています",
+    message: "買掛 INV-2042 / 株式会社サンプル商事 ¥286,000（期限を3日超過）",
+    date: "本日",
+    relatedId: "INV-2042",
   },
   {
     id: "AL-02",
+    type: "overdue_receivable",
     severity: "danger",
-    title: "入金期日を超過しています",
-    detail: "売掛 INV-1987 / 合同会社ミドリ ¥540,000（期日を5日超過）",
-    time: "本日",
+    label: "入金期日を超過しています",
+    message: "売掛 INV-1987 / 合同会社ミドリ ¥540,000（期日を5日超過）",
+    date: "本日",
+    relatedId: "INV-1987",
   },
   {
     id: "AL-03",
+    type: "pending_close",
     severity: "warning",
-    title: "月次締めに残作業があります",
-    detail: "5月：未消込 3件・未承認 8件 が未処理です",
-    time: "本日",
+    label: "月次締めに残作業があります",
+    message: "5月：未消込 3件・未承認 8件 が未処理です",
+    date: "本日",
   },
   {
     id: "AL-04",
+    type: "cash_warning",
     severity: "warning",
-    title: "資金繰り注意",
-    detail: "近日支払により現預金が安全水準（¥5,000,000）を一時的に下回る見込み",
-    time: "本日",
+    label: "資金繰り注意",
+    message:
+      "近日支払により現預金が安全水準（¥5,000,000）を一時的に下回る見込み",
+    date: "本日",
   },
   {
     id: "AL-05",
+    type: "master_data",
     severity: "info",
-    title: "取引先マスタの未整備",
-    detail: "適格請求書発行事業者番号が未登録の取引先が 2 社あります",
-    time: "昨日",
+    label: "取引先マスタの未整備",
+    message: "適格請求書発行事業者番号が未登録の取引先が 2 社あります",
+    date: "昨日",
   },
 ];
 

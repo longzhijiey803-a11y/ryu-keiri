@@ -7,12 +7,15 @@ import { FileText, Image as ImageIcon, Link2, Search } from "lucide-react";
 import {
   Avatar,
   DataTable,
+  DueCell,
   EditableStatus,
   EmptyState,
 } from "@/components/ui";
-import { formatISODate, formatJPY } from "@/lib/utils";
+import { addDaysISO, formatISODate, formatJPY } from "@/lib/utils";
+import { TODAY } from "@/lib/types/invoice";
 import {
   DOCUMENT_STATUSES,
+  isUnlinked,
   type Document,
   type DocumentStatus,
 } from "@/lib/types/document";
@@ -123,6 +126,19 @@ function buildColumns(
       ) : (
         <span className="text-muted-foreground/50">—</span>
       ),
+  },
+  {
+    id: "link_due_date",
+    header: "紐づけ期限",
+    accessorFn: (d) => addDaysISO(d.uploaded_at, 7),
+    cell: ({ row }) => {
+      const d = row.original;
+      const due = addDaysISO(d.uploaded_at, 7);
+      const linked = !isUnlinked(d);
+      return (
+        <DueCell due={due} today={TODAY} done={linked} doneLabel="紐づけ済" />
+      );
+    },
   },
   {
     id: "status",

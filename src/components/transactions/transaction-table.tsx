@@ -8,18 +8,21 @@ import {
   Avatar,
   Badge,
   DataTable,
+  DueCell,
   EditableStatus,
   EmptyState,
 } from "@/components/ui";
-import { formatISODate, formatJPY } from "@/lib/utils";
+import { cn, formatISODate, formatJPY } from "@/lib/utils";
 import {
   JOURNAL_STATUSES,
   JOURNAL_STATUS_LABEL,
+  TRANSACTION_KIND_DIRECTION,
   TRANSACTION_STATUSES,
   type JournalStatus,
   type Transaction,
   type TransactionStatus,
 } from "@/lib/types/transaction";
+import { TODAY } from "@/lib/types/invoice";
 import {
   TransactionKindBadge,
   TransactionStatusBadge,
@@ -68,11 +71,24 @@ function buildColumns(
     {
       id: "amount",
       header: "金額",
-      accessorFn: (t) => t.amount,
+      accessorFn: (t) =>
+        TRANSACTION_KIND_DIRECTION[t.kind] === "outflow" ? -t.amount : t.amount,
       meta: { align: "right" },
-      cell: ({ row }) => (
-        <span className="font-medium">{formatJPY(row.original.amount)}</span>
-      ),
+      cell: ({ row }) => {
+        const dir = TRANSACTION_KIND_DIRECTION[row.original.kind];
+        const signed =
+          dir === "outflow" ? -row.original.amount : row.original.amount;
+        return (
+          <span
+            className={cn(
+              "font-medium tabular",
+              dir === "outflow" && "text-danger",
+            )}
+          >
+            {formatJPY(signed)}
+          </span>
+        );
+      },
     },
     {
       id: "status",
@@ -104,14 +120,14 @@ function buildColumns(
       id: "due_date",
       header: "支払/入金期日",
       accessorFn: (t) => t.due_date ?? "",
-      cell: ({ row }) =>
-        row.original.due_date ? (
-          <span className="tabular whitespace-nowrap text-muted-foreground">
-            {formatISODate(row.original.due_date)}
-          </span>
-        ) : (
-          <span className="text-muted-foreground/50">—</span>
-        ),
+      cell: ({ row }) => (
+        <DueCell
+          due={row.original.due_date}
+          today={TODAY}
+          done={row.original.status === "done"}
+          doneLabel="完了"
+        />
+      ),
     },
     {
       id: "assignee",

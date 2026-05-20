@@ -38,6 +38,8 @@ export function JournalClient() {
   const [selectedId, setSelectedId] = React.useState<string | null>(null);
   const [detailOpen, setDetailOpen] = React.useState(false);
   const [createOpen, setCreateOpen] = React.useState(false);
+  // 編集対象（編集モードでは作成ドロワーを使い回す）
+  const [editingId, setEditingId] = React.useState<string | null>(null);
 
   const filtered = React.useMemo(
     () => filterJournal(list, filter),
@@ -64,6 +66,107 @@ export function JournalClient() {
     toast({
       title: "仕訳ステータスを更新しました",
       description: `${id} → ${JOURNAL_ENTRY_STATUS_LABEL[status]}`,
+      variant: "success",
+    });
+  };
+
+  /** AI推測の勘定科目を人間が選び直す。修正後は ai_predicted フラグを外す。 */
+  const handleAccountChange = (
+    entryId: string,
+    lineId: string,
+    code: string,
+  ) => {
+    setList((prev) =>
+      prev.map((e) => {
+        if (e.id !== entryId) return e;
+        return {
+          ...e,
+          updated_at: new Date().toISOString(),
+          lines: e.lines.map((l) =>
+            l.id === lineId
+              ? {
+                  ...l,
+                  account_code: code,
+                  account_name: accountName(code),
+                  ai_predicted: false,
+                }
+              : l,
+          ),
+        };
+      }),
+    );
+    toast({
+      title: "勘定科目を変更しました",
+      description: `${entryId} → ${accountName(code)}`,
+      variant: "success",
+    });
+  };
+
+  /** AI推測仕訳をワンクリックで確定する。 */
+  const handleConfirm = (entryId: string) => {
+    setList((prev) =>
+      prev.map((e) =>
+        e.id === entryId
+          ? {
+              ...e,
+              status: "confirmed",
+              updated_at: new Date().toISOString(),
+              lines: e.lines.map((l) => ({ ...l, ai_predicted: false })),
+            }
+          : e,
+      ),
+    );
+    toast({
+      title: "仕訳を確定しました",
+      description: entryId,
+      variant: "success",
+    });
+  };
+
+  /** 詳細ドロワーで「編集」を押されたとき、編集モードで作成ドロワーを開き直す。 */
+  const handleEdit = (entry: JournalEntry) => {
+    setEditingId(entry.id);
+    setDetailOpen(false);
+    setCreateOpen(true);
+  };
+
+  /** 既存仕訳の更新。明細は新規ID（JL-Eseq）で全置換する。 */
+  const handleUpdate = (id: string, d: JournalDraft) => {
+    const now = new Date().toISOString();
+    setList((prev) =>
+      prev.map((e) => {
+        if (e.id !== id) return e;
+        let seq = 0;
+        const lines: JournalLine[] = d.lines.map((l) => ({
+          ...l,
+          id: `JL-E${id}-${++seq}`,
+          account_name: accountName(l.account_code),
+          ai_predicted: false,
+        }));
+        const rel = d.related_transaction_id
+          ? TRANSACTIONS.find((t) => t.id === d.related_transaction_id)
+          : null;
+        return {
+          ...e,
+          entry_date: d.entry_date,
+          description: d.description,
+          // AI 推測が編集されたら確認待ちへ昇格させる
+          status: e.status === "ai_predicted" ? "review" : e.status,
+          lines,
+          debit_total: sumSide(lines, "debit"),
+          credit_total: sumSide(lines, "credit"),
+          related_transaction_id: d.related_transaction_id,
+          related_transaction_name: rel ? rel.name : null,
+          memo: d.memo,
+          updated_at: now,
+        };
+      }),
+    );
+    setEditingId(null);
+    setCreateOpen(false);
+    toast({
+      title: "仕訳を更新しました",
+      description: `${id} ・ ${d.description}`,
       variant: "success",
     });
   };
@@ -142,6 +245,8 @@ export function JournalClient() {
         data={filtered}
         onRowClick={openDetail}
         onStatusChange={handleStatusChange}
+        onAccountChange={handleAccountChange}
+        onConfirm={handleConfirm}
       />
 
       <JournalDetailDrawer
@@ -151,12 +256,20 @@ export function JournalClient() {
           setDetailOpen(o);
           if (!o) setSelectedId(null);
         }}
+        onEdit={handleEdit}
       />
 
       <JournalCreateDrawer
         open={createOpen}
-        onOpenChange={setCreateOpen}
+        onOpenChange={(o) => {
+          setCreateOpen(o);
+          if (!o) setEditingId(null);
+        }}
         onCreate={handleCreate}
+        onUpdate={handleUpdate}
+        initialEntry={
+          editingId ? list.find((e) => e.id === editingId) ?? null : null
+        }
       />
     </>
   );

@@ -5,7 +5,6 @@ import {
   Clock,
   FileText,
   History as HistoryIcon,
-  MessageSquare,
   Paperclip,
 } from "lucide-react";
 
@@ -21,24 +20,33 @@ import {
   DrawerFooter,
   DrawerHeader,
   DrawerTitle,
+  DueCell,
   EmptyState,
   Tabs,
   TabsContent,
   TabsList,
   TabsTrigger,
 } from "@/components/ui";
-import { formatISODate, formatISODateTime, formatJPY } from "@/lib/utils";
+import { cn, formatISODate, formatISODateTime, formatJPY } from "@/lib/utils";
 import {
   JOURNAL_STATUS_LABEL,
   TAX_CATEGORY_LABEL,
+  TRANSACTION_KIND_DIRECTION,
   TRANSACTION_KIND_LABEL,
-  type ApprovalStepStatus,
   type Transaction,
+  type TransactionComment,
 } from "@/lib/types/transaction";
+import { TODAY } from "@/lib/types/invoice";
+import { CURRENT_USER, CURRENT_USER_ID } from "@/lib/current-user";
 import {
   TransactionKindBadge,
   TransactionStatusBadge,
 } from "./transaction-badges";
+import { TransactionComments } from "./transaction-comments";
+import {
+  ApprovalActionWithPassword,
+  type ApprovalActionKind,
+} from "./approval-action-with-password";
 
 function kb(bytes: number) {
   return bytes >= 1_000_000
@@ -61,26 +69,56 @@ function Row({
   );
 }
 
-const APPROVAL_BADGE: Record<
-  ApprovalStepStatus,
-  { v: "success" | "danger" | "warning" | "neutral"; t: string }
-> = {
-  approved: { v: "success", t: "承認" },
-  rejected: { v: "danger", t: "差戻し" },
-  pending: { v: "warning", t: "承認待ち" },
-  skipped: { v: "neutral", t: "スキップ" },
-};
-
 export function TransactionDetailDrawer({
   txn,
   open,
   onOpenChange,
+  onAddComment,
+  onApprovalAction,
 }: {
   txn: Transaction | null;
   open: boolean;
   onOpenChange: (o: boolean) => void;
+  /** コメント追加。未指定の場合は drawer ローカル state のみ更新（プレビュー用）。 */
+  onAddComment?: (txnId: string, body: string) => void;
+  /** 承認ステップへのアクション（承認/差戻し/却下）を親に通知。 */
+  onApprovalAction?: (
+    txnId: string,
+    stepId: string,
+    action: ApprovalActionKind,
+    comment: string,
+  ) => void;
 }) {
+  // hooks は早期 return より前に呼ぶ（React Hooks ルール）
+  const [extraComments, setExtraComments] = React.useState<TransactionComment[]>(
+    [],
+  );
+  // 取引が切り替わったらローカル追加分はリセット
+  const txnId = txn?.id;
+  React.useEffect(() => {
+    setExtraComments([]);
+  }, [txnId]);
+
   if (!txn) return null;
+
+  const localComments = [...txn.comments, ...extraComments];
+
+  const addComment = (body: string) => {
+    if (onAddComment) {
+      onAddComment(txn.id, body);
+      return;
+    }
+    const now = new Date().toISOString();
+    setExtraComments((prev) => [
+      ...prev,
+      {
+        id: `LC-${txn.id}-${now}`,
+        author: CURRENT_USER,
+        body,
+        created_at: now,
+      },
+    ]);
+  };
 
   const debit = txn.journal?.lines
     .filter((l) => l.side === "debit")
@@ -102,8 +140,19 @@ export function TransactionDetailDrawer({
           </DrawerDescription>
           <div className="mt-2 flex items-center gap-3">
             <TransactionStatusBadge status={txn.status} />
-            <span className="tabular text-lg font-semibold text-foreground">
-              {formatJPY(txn.amount)}
+            <span
+              className={cn(
+                "tabular text-lg font-semibold",
+                TRANSACTION_KIND_DIRECTION[txn.kind] === "outflow"
+                  ? "text-danger"
+                  : "text-foreground",
+              )}
+            >
+              {formatJPY(
+                TRANSACTION_KIND_DIRECTION[txn.kind] === "outflow"
+                  ? -txn.amount
+                  : txn.amount,
+              )}
             </span>
           </div>
         </DrawerHeader>
@@ -120,7 +169,7 @@ export function TransactionDetailDrawer({
                 承認{txn.approvals.length ? `（${txn.approvals.length}）` : ""}
               </TabsTrigger>
               <TabsTrigger value="comments">
-                コメント{txn.comments.length ? `（${txn.comments.length}）` : ""}
+                コメント{localComments.length ? `（${localComments.length}）` : ""}
               </TabsTrigger>
               <TabsTrigger value="history">履歴</TabsTrigger>
             </TabsList>
@@ -140,8 +189,18 @@ export function TransactionDetailDrawer({
                   )}
                 </Row>
                 <Row label="金額">
-                  <span className="tabular font-medium">
-                    {formatJPY(txn.amount)}
+                  <span
+                    className={cn(
+                      "tabular font-medium",
+                      TRANSACTION_KIND_DIRECTION[txn.kind] === "outflow" &&
+                        "text-danger",
+                    )}
+                  >
+                    {formatJPY(
+                      TRANSACTION_KIND_DIRECTION[txn.kind] === "outflow"
+                        ? -txn.amount
+                        : txn.amount,
+                    )}
                   </span>
                 </Row>
                 <Row label="税区分">
@@ -153,13 +212,12 @@ export function TransactionDetailDrawer({
                   </span>
                 </Row>
                 <Row label="支払/入金期日">
-                  {txn.due_date ? (
-                    <span className="tabular">
-                      {formatISODate(txn.due_date)}
-                    </span>
-                  ) : (
-                    "—"
-                  )}
+                  <DueCell
+                    due={txn.due_date}
+                    today={TODAY}
+                    done={txn.status === "done"}
+                    doneLabel="完了"
+                  />
                 </Row>
                 <Row label="担当者">
                   <span className="inline-flex items-center gap-2">
@@ -305,69 +363,26 @@ export function TransactionDetailDrawer({
                 />
               ) : (
                 <ol className="space-y-3">
-                  {txn.approvals.map((s) => {
-                    const b = APPROVAL_BADGE[s.status];
-                    return (
-                      <li
-                        key={s.id}
-                        className="rounded-md border border-border p-3"
-                      >
-                        <div className="flex items-center justify-between gap-2">
-                          <span className="text-sm font-medium text-foreground">
-                            {s.order}. {s.role}（{s.approver.name}）
-                          </span>
-                          <Badge variant={b.v}>{b.t}</Badge>
-                        </div>
-                        <p className="mt-1 text-xs text-muted-foreground">
-                          {s.acted_at
-                            ? formatISODateTime(s.acted_at)
-                            : "未対応"}
-                          {s.comment ? ` ・ ${s.comment}` : ""}
-                        </p>
-                      </li>
-                    );
-                  })}
+                  {txn.approvals.map((s) => (
+                    <ApprovalActionWithPassword
+                      key={s.id}
+                      step={s}
+                      currentUserId={CURRENT_USER_ID}
+                      onAction={(stepId, action, comment) =>
+                        onApprovalAction?.(txn.id, stepId, action, comment)
+                      }
+                    />
+                  ))}
                 </ol>
               )}
             </TabsContent>
 
             {/* コメント */}
             <TabsContent value="comments">
-              {txn.comments.length === 0 ? (
-                <EmptyState
-                  icon={MessageSquare}
-                  title="コメントはありません"
-                  compact
-                />
-              ) : (
-                <ul className="space-y-3">
-                  {txn.comments.map((c) => (
-                    <li key={c.id} className="flex gap-3">
-                      <Avatar name={c.author.name} size="sm" />
-                      <div className="min-w-0 flex-1">
-                        <p className="text-sm">
-                          <span className="font-medium text-foreground">
-                            {c.author.name}
-                          </span>
-                          <span className="ml-2 text-xs text-muted-foreground">
-                            {formatISODateTime(c.created_at)}
-                          </span>
-                        </p>
-                        <p className="mt-0.5 text-sm text-foreground">
-                          {c.body}
-                        </p>
-                      </div>
-                    </li>
-                  ))}
-                </ul>
-              )}
-              <div className="mt-4 border-t border-border pt-4">
-                <textarea
-                  disabled
-                  placeholder="コメントを追加（Step 後続で有効化）"
-                  className="h-20 w-full resize-none rounded-md border border-border bg-muted px-3 py-2 text-sm text-muted-foreground"
-                />
-              </div>
+              <TransactionComments
+                comments={localComments}
+                onAdd={addComment}
+              />
             </TabsContent>
 
             {/* 履歴 */}

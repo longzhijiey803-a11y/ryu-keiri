@@ -63,6 +63,10 @@ export interface ExpenseClaim {
   applicant_id: ID;
   department: string;
   claim_date: ISODate; // 申請日
+  /** 承認期限（社内SLA: 申請日 + 5営業日想定） */
+  approval_due_date: ISODate;
+  /** 精算期限（承認後の振込期日。月次の精算スケジュール想定） */
+  settlement_due_date: ISODate;
   status: ExpenseStatus;
   pay_state: ExpensePayState;
   lines: ExpenseLine[];

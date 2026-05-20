@@ -7,10 +7,12 @@ import { AlertTriangle, Paperclip, Search } from "lucide-react";
 import {
   Avatar,
   DataTable,
+  DueCell,
   EditableStatus,
   EmptyState,
 } from "@/components/ui";
 import { formatISODate, formatJPY } from "@/lib/utils";
+import { TODAY } from "@/lib/types/invoice";
 import {
   EXPENSE_PAY_STATES,
   EXPENSE_STATUSES,
@@ -89,6 +91,44 @@ function buildColumns(
           {formatISODate(row.original.claim_date)}
         </span>
       ),
+    },
+    {
+      id: "approval_due_date",
+      header: "承認期限",
+      accessorFn: (c) => c.approval_due_date,
+      cell: ({ row }) => {
+        const c = row.original;
+        const done =
+          c.status === "approved" ||
+          c.status === "scheduled" ||
+          c.status === "settled" ||
+          c.status === "rejected";
+        return (
+          <DueCell
+            due={c.approval_due_date}
+            today={TODAY}
+            done={done}
+            doneLabel="承認済"
+          />
+        );
+      },
+    },
+    {
+      id: "settlement_due_date",
+      header: "精算期限",
+      accessorFn: (c) => c.settlement_due_date,
+      cell: ({ row }) => {
+        const c = row.original;
+        const done = c.pay_state === "settled";
+        return (
+          <DueCell
+            due={c.settlement_due_date}
+            today={TODAY}
+            done={done}
+            doneLabel="精算済"
+          />
+        );
+      },
     },
     {
       id: "status",

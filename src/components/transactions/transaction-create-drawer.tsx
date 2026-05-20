@@ -74,7 +74,7 @@ export function TransactionCreateDrawer({
     resolver: zodResolver(schema),
     defaultValues: {
       name: "",
-      kind: "sales",
+      kind: "income_invoice",
       partner_id: "",
       amount: undefined,
       tax_category: "taxable_10",
@@ -148,7 +148,7 @@ export function TransactionCreateDrawer({
                       <SelectTrigger>
                         <SelectValue />
                       </SelectTrigger>
-                      <SelectContent>
+                      <SelectContent className="max-h-60 overflow-y-auto">
                         {TRANSACTION_KINDS.map((k) => (
                           <SelectItem key={k} value={k}>
                             {TRANSACTION_KIND_LABEL[k]}

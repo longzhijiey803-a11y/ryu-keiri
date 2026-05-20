@@ -40,6 +40,8 @@ export interface DataTableProps<TData> {
   getRowId?: (row: TData, index: number) => string;
   /** テーブル上部のツールバー（検索/フィルタ/一括操作を差し込む） */
   toolbar?: React.ReactNode;
+  /** 行ごとの追加クラス（行ハイライト用） */
+  rowClassName?: (row: TData) => string | undefined;
 }
 
 const alignClass = (a?: "left" | "right" | "center") =>
@@ -56,6 +58,7 @@ export function DataTable<TData>({
   onRowSelectionChange,
   getRowId,
   toolbar,
+  rowClassName,
 }: DataTableProps<TData>) {
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [internalSelection, setInternalSelection] =
@@ -190,6 +193,7 @@ export function DataTable<TData>({
                     "h-table-row border-t border-border transition-colors",
                     onRowClick && "cursor-pointer hover:bg-muted/50",
                     row.getIsSelected() && "bg-primary/5",
+                    rowClassName?.(row.original),
                   )}
                 >
                   {enableRowSelection && (

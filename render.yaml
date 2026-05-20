@@ -1,0 +1,26 @@
+# Render Blueprint
+# 参考: https://render.com/docs/blueprint-spec
+# - Web Service として Next.js を SSR/CSR 両対応で起動
+# - 環境変数の Supabase キーは未設定でも動作（モックダミーで動く）
+services:
+  - type: web
+    name: ryu-keiri
+    runtime: node
+    plan: free
+    region: singapore
+    buildCommand: npm ci && npm run build
+    startCommand: npm run start
+    healthCheckPath: /
+    autoDeploy: true
+    envVars:
+      - key: NODE_VERSION
+        value: "20"
+      - key: NEXT_TELEMETRY_DISABLED
+        value: "1"
+      # 必要になったら Render ダッシュボードから直接設定
+      - key: NEXT_PUBLIC_SUPABASE_URL
+        sync: false
+      - key: NEXT_PUBLIC_SUPABASE_ANON_KEY
+        sync: false
+      - key: SUPABASE_SERVICE_ROLE_KEY
+        sync: false

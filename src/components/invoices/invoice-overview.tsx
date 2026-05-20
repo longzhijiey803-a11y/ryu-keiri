@@ -1,5 +1,6 @@
 import {
   AlertTriangle,
+  CalendarClock,
   FileCheck2,
   FileClock,
   FileText,
@@ -9,8 +10,8 @@ import {
 
 import { KpiCard } from "@/components/dashboard/kpi-card";
 import { ISSUED_INVOICES, RECEIVED_INVOICES } from "@/lib/invoice-data";
-import { isOverdue } from "@/lib/types/invoice";
-import { formatJPY } from "@/lib/utils";
+import { TODAY, isOverdue, type Invoice } from "@/lib/types/invoice";
+import { daysBetweenISO, formatISODate, formatJPY } from "@/lib/utils";
 
 function GroupLabel({ children }: { children: React.ReactNode }) {
   return (
@@ -18,6 +19,19 @@ function GroupLabel({ children }: { children: React.ReactNode }) {
       {children}
     </p>
   );
+}
+
+function nextUpcoming(list: Invoice[]): Invoice | null {
+  return (
+    [...list].sort((a, b) => a.due_date.localeCompare(b.due_date))[0] ?? null
+  );
+}
+
+function dueLabel(due: string): string {
+  const d = daysBetweenISO(TODAY, due);
+  if (d < 0) return `${Math.abs(d)}日超過`;
+  if (d === 0) return "本日まで";
+  return `あと${d}日`;
 }
 
 export function InvoiceOverview() {
@@ -40,8 +54,57 @@ export function InvoiceOverview() {
   );
   const recvOverdue = RECEIVED_INVOICES.filter(isOverdue);
 
+  const nextDeposit = nextUpcoming(
+    ISSUED_INVOICES.filter((i) => i.payment_state !== "paid"),
+  );
+  const nextPayment = nextUpcoming(
+    RECEIVED_INVOICES.filter((i) => i.payment_state !== "paid"),
+  );
+
   return (
     <div className="space-y-8">
+      <section>
+        <GroupLabel>直近の期限</GroupLabel>
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+          <KpiCard
+            label="次の入金期限（発行）"
+            value={
+              nextDeposit
+                ? `${formatISODate(nextDeposit.due_date)} ・ ${dueLabel(nextDeposit.due_date)}`
+                : "—"
+            }
+            sub={
+              nextDeposit
+                ? `${nextDeposit.partner.name} ・ ${formatJPY(nextDeposit.total)}`
+                : "入金待ち案件なし"
+            }
+            icon={CalendarClock}
+            tone={
+              nextDeposit && nextDeposit.due_date < TODAY ? "danger" : "primary"
+            }
+            href="/invoices/issued"
+          />
+          <KpiCard
+            label="次の支払期限（受領）"
+            value={
+              nextPayment
+                ? `${formatISODate(nextPayment.due_date)} ・ ${dueLabel(nextPayment.due_date)}`
+                : "—"
+            }
+            sub={
+              nextPayment
+                ? `${nextPayment.partner.name} ・ ${formatJPY(nextPayment.total)}`
+                : "支払案件なし"
+            }
+            icon={CalendarClock}
+            tone={
+              nextPayment && nextPayment.due_date < TODAY ? "danger" : "primary"
+            }
+            href="/invoices/received"
+          />
+        </div>
+      </section>
+
       <section>
         <GroupLabel>発行請求書</GroupLabel>
         <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">

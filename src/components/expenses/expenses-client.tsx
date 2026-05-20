@@ -6,6 +6,7 @@ import { Plus } from "lucide-react";
 import { Button, useToast } from "@/components/ui";
 import { EXPENSE_CLAIMS, filterClaims } from "@/lib/expense-data";
 import { USERS } from "@/lib/transactions-data";
+import { addDaysISO } from "@/lib/utils";
 import { applyApprovalAction, addClaimComment } from "@/lib/claim-actions";
 import type {
   ExpenseClaim,
@@ -90,6 +91,8 @@ export function ExpensesClient() {
       applicant_id: applicant.id,
       department: d.department,
       claim_date: d.claim_date,
+      approval_due_date: addDaysISO(d.claim_date, 7),
+      settlement_due_date: addDaysISO(d.claim_date, 14),
       status: "submitted",
       pay_state: "unpaid",
       lines,

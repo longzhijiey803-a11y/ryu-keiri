@@ -31,6 +31,15 @@ export function daysBetweenISO(a: string, b: string): number {
   return Math.round((p(b) - p(a)) / 86_400_000);
 }
 
+/** ISO日付("YYYY-MM-DD")に日数を加算した ISO 日付を返す（UTC固定）。 */
+export function addDaysISO(iso: string, days: number): string {
+  const [y, m, d] = iso.slice(0, 10).split("-").map(Number);
+  const t = Date.UTC(y, m - 1, d) + days * 86_400_000;
+  const dt = new Date(t);
+  const pad = (n: number) => String(n).padStart(2, "0");
+  return `${dt.getUTCFullYear()}-${pad(dt.getUTCMonth() + 1)}-${pad(dt.getUTCDate())}`;
+}
+
 /**
  * ISO 日付/日時を tz 非依存・決定的に整形（SSR ハイドレーション不一致を回避）。
  * 例: "2026-05-12" → "2026/05/12" / "2026-05-12T10:42:00+09:00" → "2026/05/12 10:42"

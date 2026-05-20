@@ -31,7 +31,11 @@ import {
   TAX_CATEGORY_LABEL,
   type TaxCategory,
 } from "@/lib/types/transaction";
-import type { JournalDraft, JournalSide } from "@/lib/types/journal";
+import type {
+  JournalDraft,
+  JournalEntry,
+  JournalSide,
+} from "@/lib/types/journal";
 import { JournalSuggestionPanel } from "./journal-suggestion-panel";
 
 const lineSchema = z.object({
@@ -90,15 +94,49 @@ function emptyLine(side: JournalSide) {
   };
 }
 
+function entryToFormValues(entry: JournalEntry): FormValues {
+  return {
+    entry_date: entry.entry_date,
+    description: entry.description,
+    related_transaction_id: entry.related_transaction_id ?? "",
+    memo: entry.memo ?? "",
+    lines: entry.lines.map((l) => ({
+      side: l.side,
+      account_code: l.account_code,
+      sub_account: l.sub_account ?? "",
+      amount: l.amount,
+      tax_category: l.tax_category,
+      tax_amount: l.tax_amount,
+      department: l.department ?? "",
+      project: l.project ?? "",
+    })),
+  };
+}
+
+const EMPTY_DEFAULTS: FormValues = {
+  entry_date: "",
+  description: "",
+  related_transaction_id: "",
+  memo: "",
+  lines: [emptyLine("debit"), emptyLine("credit")],
+};
+
 export function JournalCreateDrawer({
   open,
   onOpenChange,
   onCreate,
+  onUpdate,
+  initialEntry,
 }: {
   open: boolean;
   onOpenChange: (o: boolean) => void;
   onCreate: (draft: JournalDraft) => void;
+  /** 編集モード時に呼ばれる。指定があれば「編集」モードとして動作。 */
+  onUpdate?: (id: string, draft: JournalDraft) => void;
+  /** 編集対象の仕訳。指定があれば編集モード。 */
+  initialEntry?: JournalEntry | null;
 }) {
+  const isEdit = !!initialEntry && !!onUpdate;
   const [files, setFiles] = React.useState<string[]>([]);
   const {
     register,
@@ -110,15 +148,21 @@ export function JournalCreateDrawer({
     formState: { errors, isSubmitting },
   } = useForm<FormValues>({
     resolver: zodResolver(schema),
-    defaultValues: {
-      entry_date: "",
-      description: "",
-      related_transaction_id: "",
-      memo: "",
-      lines: [emptyLine("debit"), emptyLine("credit")],
-    },
+    defaultValues: EMPTY_DEFAULTS,
   });
   const { fields, append, remove } = useFieldArray({ control, name: "lines" });
+
+  // 開く度に初期値を切り替え（編集対象が変わったときも追従）
+  React.useEffect(() => {
+    if (!open) return;
+    if (initialEntry) {
+      reset(entryToFormValues(initialEntry));
+      setFiles(initialEntry.attachments.map((a) => a.file_name));
+    } else {
+      reset(EMPTY_DEFAULTS);
+      setFiles([]);
+    }
+  }, [open, initialEntry, reset]);
 
   const watched = watch("lines");
   const debitSum = (watched ?? [])
@@ -154,7 +198,7 @@ export function JournalCreateDrawer({
   };
 
   const submit = handleSubmit((v) => {
-    onCreate({
+    const draft: JournalDraft = {
       entry_date: v.entry_date,
       description: v.description,
       related_transaction_id: v.related_transaction_id || null,
@@ -170,7 +214,12 @@ export function JournalCreateDrawer({
         project: l.project || null,
       })),
       attachment_names: files,
-    });
+    };
+    if (isEdit && initialEntry) {
+      onUpdate!(initialEntry.id, draft);
+    } else {
+      onCreate(draft);
+    }
     reset();
     setFiles([]);
   });
@@ -338,7 +387,9 @@ export function JournalCreateDrawer({
     <Drawer open={open} onOpenChange={(o) => (o ? onOpenChange(true) : close())}>
       <DrawerContent size="xl">
         <DrawerHeader>
-          <DrawerTitle>新規仕訳</DrawerTitle>
+          <DrawerTitle>
+            {isEdit ? `仕訳を編集 ・ ${initialEntry?.id}` : "新規仕訳"}
+          </DrawerTitle>
           <DrawerDescription>
             複式簿記。借方合計と貸方合計を一致させてください。
           </DrawerDescription>
@@ -527,7 +578,7 @@ export function JournalCreateDrawer({
               loading={isSubmitting}
               disabled={!balanced}
             >
-              仕訳を作成
+              {isEdit ? "変更を保存" : "仕訳を作成"}
             </Button>
           </div>
         </DrawerFooter>

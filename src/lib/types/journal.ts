@@ -24,6 +24,7 @@ export type { TaxCategory };
 /* ── 仕訳ステータス ─────────────────────── */
 export const JOURNAL_ENTRY_STATUSES = [
   "draft",
+  "ai_predicted",
   "review",
   "confirmed",
   "revised",
@@ -32,6 +33,7 @@ export const JOURNAL_ENTRY_STATUSES = [
 export type JournalEntryStatus = (typeof JOURNAL_ENTRY_STATUSES)[number];
 export const JOURNAL_ENTRY_STATUS_LABEL: Record<JournalEntryStatus, string> = {
   draft: "下書き",
+  ai_predicted: "AI推測",
   review: "確認待ち",
   confirmed: "確定",
   revised: "修正済み",
@@ -76,6 +78,11 @@ export interface JournalLine {
   tax_amount: number; // 消費税額（内訳・整数）
   department: string | null;
   project: string | null;
+  /**
+   * AI が推測した勘定科目で、人間の確認待ちであるか。
+   * true の間は表示上「🤖 推測:」ラベル＋斜体＋下点線で警告表示する。
+   */
+  ai_predicted?: boolean;
 }
 
 /* ── 仕訳（伝票） ───────────────────────── */
@@ -115,6 +122,7 @@ export interface JournalLineDraft {
   tax_amount: number;
   department: string | null;
   project: string | null;
+  ai_predicted?: boolean;
 }
 export interface JournalDraft {
   entry_date: ISODate;

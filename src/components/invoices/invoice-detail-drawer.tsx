@@ -7,7 +7,6 @@ import {
   History as HistoryIcon,
   Link2,
   Paperclip,
-  Wallet,
 } from "lucide-react";
 
 import {
@@ -22,20 +21,22 @@ import {
   DrawerFooter,
   DrawerHeader,
   DrawerTitle,
+  DueCell,
   EmptyState,
   Tabs,
   TabsContent,
   TabsList,
   TabsTrigger,
 } from "@/components/ui";
-import { cn, formatISODate, formatISODateTime, formatJPY } from "@/lib/utils";
+import { formatISODate, formatISODateTime, formatJPY } from "@/lib/utils";
 import { TAX_CATEGORY_LABEL } from "@/lib/types/transaction";
-import { isOverdue, type Invoice } from "@/lib/types/invoice";
+import { TODAY, isOverdue, type Invoice, type Payment } from "@/lib/types/invoice";
 import {
   InvoiceStatusBadge,
   OverdueBadge,
   PaymentStateBadge,
 } from "./invoice-badges";
+import { InvoicePaymentTab } from "./invoice-payment-tab";
 
 function Row({
   label,
@@ -63,10 +64,12 @@ export function InvoiceDetailDrawer({
   invoice,
   open,
   onOpenChange,
+  onAddPayment,
 }: {
   invoice: Invoice | null;
   open: boolean;
   onOpenChange: (o: boolean) => void;
+  onAddPayment?: (invoiceId: string, payment: Payment) => void;
 }) {
   if (!invoice) return null;
   const inv = invoice;
@@ -151,14 +154,12 @@ export function InvoiceDetailDrawer({
                   </span>
                 </Row>
                 <Row label="支払期限">
-                  <span
-                    className={cn(
-                      "tabular",
-                      isOverdue(inv) && "font-medium text-danger",
-                    )}
-                  >
-                    {formatISODate(inv.due_date)}
-                  </span>
+                  <DueCell
+                    due={inv.due_date}
+                    today={TODAY}
+                    done={inv.payment_state === "paid"}
+                    doneLabel={inv.direction === "issued" ? "入金済" : "支払済"}
+                  />
                 </Row>
                 <Row label={isIssued ? "ステータス" : "承認状態"}>
                   <InvoiceStatusBadge
@@ -267,54 +268,12 @@ export function InvoiceDetailDrawer({
             </TabsContent>
 
             <TabsContent value="payment">
-              <div className="mb-3 grid grid-cols-3 gap-3 rounded-md border border-border p-3 text-sm">
-                <div>
-                  <p className="text-xs text-muted-foreground">請求額</p>
-                  <p className="tabular font-medium">
-                    {formatJPY(inv.total)}
-                  </p>
-                </div>
-                <div>
-                  <p className="text-xs text-muted-foreground">
-                    {isIssued ? "入金済" : "支払済"}
-                  </p>
-                  <p className="tabular font-medium">{formatJPY(paid)}</p>
-                </div>
-                <div>
-                  <p className="text-xs text-muted-foreground">残額</p>
-                  <p
-                    className={cn(
-                      "tabular font-medium",
-                      remaining > 0 ? "text-danger" : "text-success",
-                    )}
-                  >
-                    {formatJPY(remaining)}
-                  </p>
-                </div>
-              </div>
-              {inv.payments.length === 0 ? (
-                <EmptyState
-                  icon={Wallet}
-                  title={isIssued ? "入金記録がありません" : "支払記録がありません"}
-                  compact
-                />
-              ) : (
-                <ul className="divide-y divide-border">
-                  {inv.payments.map((p) => (
-                    <li
-                      key={p.id}
-                      className="flex items-center justify-between py-2.5 text-sm"
-                    >
-                      <span className="tabular text-muted-foreground">
-                        {formatISODate(p.date)} ・ {p.method}
-                      </span>
-                      <span className="tabular font-medium">
-                        {formatJPY(p.amount)}
-                      </span>
-                    </li>
-                  ))}
-                </ul>
-              )}
+              <InvoicePaymentTab
+                invoice={inv}
+                paid={paid}
+                remaining={remaining}
+                onAddPayment={onAddPayment}
+              />
             </TabsContent>
 
             <TabsContent value="journal">

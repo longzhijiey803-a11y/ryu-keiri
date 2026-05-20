@@ -43,6 +43,7 @@ export { Progress, type ProgressProps } from "./progress";
 export { LoadingState, ErrorState } from "./states";
 export { ToastProvider, useToast } from "./toast";
 export { EditableStatus, type StatusOption } from "./editable-status";
+export { DueCell } from "./due-cell";
 export {
   DropdownMenu,
   DropdownMenuTrigger,

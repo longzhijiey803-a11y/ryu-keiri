@@ -7,38 +7,31 @@ import { Paperclip, Search } from "lucide-react";
 import {
   Avatar,
   DataTable,
+  DueCell as DueDateCell,
   EditableStatus,
   EmptyState,
 } from "@/components/ui";
-import { cn, formatISODate, formatJPY } from "@/lib/utils";
+import { formatISODate, formatJPY } from "@/lib/utils";
 import {
   ISSUED_STATUSES,
   PAYMENT_STATES,
   RECEIVED_STATUSES,
-  isOverdue,
+  TODAY,
   type Invoice,
   type InvoiceDirection,
   type InvoiceStatus,
   type PaymentState,
 } from "@/lib/types/invoice";
-import {
-  InvoiceStatusBadge,
-  OverdueBadge,
-  PaymentStateBadge,
-} from "./invoice-badges";
+import { InvoiceStatusBadge, PaymentStateBadge } from "./invoice-badges";
 
 function DueCell({ inv }: { inv: Invoice }) {
-  const od = isOverdue(inv);
   return (
-    <span
-      className={cn(
-        "inline-flex items-center gap-2 whitespace-nowrap tabular",
-        od ? "font-medium text-danger" : "text-muted-foreground",
-      )}
-    >
-      {formatISODate(inv.due_date)}
-      {od && <OverdueBadge />}
-    </span>
+    <DueDateCell
+      due={inv.due_date}
+      today={TODAY}
+      done={inv.payment_state === "paid"}
+      doneLabel={inv.direction === "issued" ? "入金済" : "支払済"}
+    />
   );
 }
 

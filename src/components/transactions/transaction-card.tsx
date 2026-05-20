@@ -3,8 +3,12 @@
 import { CalendarClock, Paperclip } from "lucide-react";
 
 import { Avatar } from "@/components/ui";
-import { formatISODate, formatJPY } from "@/lib/utils";
-import type { Transaction } from "@/lib/types/transaction";
+import { cn, daysBetweenISO, formatISODate, formatJPY } from "@/lib/utils";
+import {
+  TRANSACTION_KIND_DIRECTION,
+  type Transaction,
+} from "@/lib/types/transaction";
+import { TODAY } from "@/lib/types/invoice";
 import {
   TransactionKindBadge,
   TransactionStatusBadge,
@@ -34,8 +38,19 @@ export function TransactionCard({
         {txn.partner.name}
       </p>
 
-      <p className="mt-2 tabular text-base font-semibold text-foreground">
-        {formatJPY(txn.amount)}
+      <p
+        className={cn(
+          "mt-2 tabular text-base font-semibold",
+          TRANSACTION_KIND_DIRECTION[txn.kind] === "outflow"
+            ? "text-danger"
+            : "text-foreground",
+        )}
+      >
+        {formatJPY(
+          TRANSACTION_KIND_DIRECTION[txn.kind] === "outflow"
+            ? -txn.amount
+            : txn.amount,
+        )}
       </p>
 
       <div className="mt-3 flex items-center justify-between">
@@ -47,12 +62,22 @@ export function TransactionCard({
               {txn.attachments.length}
             </span>
           )}
-          {txn.due_date && (
-            <span className="inline-flex items-center gap-0.5 tabular">
-              <CalendarClock className="size-3.5" />
-              {formatISODate(txn.due_date)}
-            </span>
-          )}
+          {txn.due_date && (() => {
+            const diff = daysBetweenISO(TODAY, txn.due_date);
+            const open = txn.status !== "done";
+            const danger = open && diff <= 3;
+            return (
+              <span
+                className={cn(
+                  "inline-flex items-center gap-0.5 tabular",
+                  danger && "font-medium text-danger",
+                )}
+              >
+                <CalendarClock className="size-3.5" />
+                {formatISODate(txn.due_date)}
+              </span>
+            );
+          })()}
           <Avatar name={txn.assignee.name} size="sm" />
         </div>
       </div>

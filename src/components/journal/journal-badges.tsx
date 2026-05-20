@@ -8,10 +8,11 @@ import {
  * 仕訳ステータスバッジ（下書き/確認待ち/確定/修正済み/取消 専用）。
  * 汎用 StatusBadge（§A-5 の13語彙固定）とは別だが同トーン配色で統一。視認性重視。
  */
-type Tone = "neutral" | "info" | "success" | "warning" | "danger";
+type Tone = "neutral" | "info" | "success" | "warning" | "danger" | "ai";
 
 const STATUS_TONE: Record<JournalEntryStatus, Tone> = {
   draft: "neutral",
+  ai_predicted: "ai",
   review: "info",
   confirmed: "success",
   revised: "warning",
@@ -24,6 +25,7 @@ const TONE_CLASS: Record<Tone, { box: string; dot: string }> = {
   success: { box: "bg-success/10 text-success", dot: "bg-success" },
   warning: { box: "bg-warning/10 text-warning", dot: "bg-warning" },
   danger: { box: "bg-danger/10 text-danger", dot: "bg-danger" },
+  ai: { box: "bg-amber-100 text-amber-800", dot: "bg-amber-500" },
 };
 
 export function JournalStatusBadge({
@@ -44,6 +46,9 @@ export function JournalStatusBadge({
       )}
     >
       <span className={cn("size-1.5 rounded-full", c.dot)} aria-hidden />
+      {status === "ai_predicted" && (
+        <span aria-hidden>🤖</span>
+      )}
       {JOURNAL_ENTRY_STATUS_LABEL[status]}
     </span>
   );

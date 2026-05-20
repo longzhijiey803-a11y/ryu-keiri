@@ -15,23 +15,57 @@ export type ID = string; // uuid
 export type ISODate = string; // "2026-05-12"
 export type ISODateTime = string; // "2026-05-12T10:42:00+09:00"
 
-/* ── 取引区分 ───────────────────────────── */
+/* ── 取引区分（実務網羅版） ─────────────── */
 export const TRANSACTION_KINDS = [
-  "sales",
-  "purchase",
-  "expense",
-  "payment",
-  "deposit",
+  "income_invoice",
+  "income_cash",
+  "expense_purchase_invoice",
+  "expense_purchase_cash",
+  "expense_general",
+  "asset_purchase",
+  "payroll",
+  "tax_payment",
+  "loan",
+  "refund_reversal",
   "transfer",
 ] as const;
 export type TransactionKind = (typeof TRANSACTION_KINDS)[number];
 export const TRANSACTION_KIND_LABEL: Record<TransactionKind, string> = {
-  sales: "売上請求",
-  purchase: "仕入",
-  expense: "経費",
-  payment: "支払",
-  deposit: "入金",
-  transfer: "振替",
+  income_invoice: "売上（請求発生）",
+  income_cash: "売上（即時入金）",
+  expense_purchase_invoice: "仕入（未決済）",
+  expense_purchase_cash: "仕入（即時支払）",
+  expense_general: "経費（一般出費）",
+  asset_purchase: "固定資産の取得",
+  payroll: "給与・労務費",
+  tax_payment: "税金・公租公課",
+  loan: "借入・返済",
+  refund_reversal: "返金・取消（赤黒）",
+  transfer: "口座間振替",
+};
+
+/**
+ * キャッシュフロー方向。
+ * - inflow: 会社にお金が入る
+ * - outflow: 会社からお金が出る
+ * - neutral: 方向が一意に決まらない（借入/返済・返金・口座間振替）
+ */
+export type CashflowDirection = "inflow" | "outflow" | "neutral";
+export const TRANSACTION_KIND_DIRECTION: Record<
+  TransactionKind,
+  CashflowDirection
+> = {
+  income_invoice: "inflow",
+  income_cash: "inflow",
+  expense_purchase_invoice: "outflow",
+  expense_purchase_cash: "outflow",
+  expense_general: "outflow",
+  asset_purchase: "outflow",
+  payroll: "outflow",
+  tax_payment: "outflow",
+  loan: "neutral",
+  refund_reversal: "neutral",
+  transfer: "neutral",
 };
 
 /* ── 取引ステータス（カンバンのステージと一致） ── */

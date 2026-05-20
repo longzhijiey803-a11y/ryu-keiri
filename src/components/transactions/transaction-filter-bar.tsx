@@ -57,10 +57,10 @@ export function TransactionFilterBar({
           set({ kind: v as TransactionFilter["kind"] })
         }
       >
-        <SelectTrigger className="w-[150px]">
+        <SelectTrigger className="w-[180px]">
           <SelectValue placeholder="取引区分" />
         </SelectTrigger>
-        <SelectContent>
+        <SelectContent className="max-h-60 overflow-y-auto">
           <SelectItem value="all">すべての区分</SelectItem>
           {TRANSACTION_KINDS.map((k) => (
             <SelectItem key={k} value={k}>

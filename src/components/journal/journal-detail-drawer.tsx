@@ -40,10 +40,13 @@ export function JournalDetailDrawer({
   entry,
   open,
   onOpenChange,
+  onEdit,
 }: {
   entry: JournalEntry | null;
   open: boolean;
   onOpenChange: (o: boolean) => void;
+  /** 編集ボタン押下時。未指定なら編集ボタンは無効。 */
+  onEdit?: (entry: JournalEntry) => void;
 }) {
   if (!entry) return null;
   const balanced =
@@ -228,7 +231,15 @@ export function JournalDetailDrawer({
           <DrawerClose asChild>
             <Button variant="secondary">閉じる</Button>
           </DrawerClose>
-          <Button disabled title="Step 後続で実装">
+          <Button
+            onClick={() => onEdit?.(entry)}
+            disabled={!onEdit || entry.status === "voided"}
+            title={
+              entry.status === "voided"
+                ? "取消済みの仕訳は編集できません"
+                : "仕訳を編集"
+            }
+          >
             編集
           </Button>
         </DrawerFooter>

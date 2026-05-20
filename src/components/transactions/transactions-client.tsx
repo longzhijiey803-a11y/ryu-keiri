@@ -12,6 +12,7 @@ import {
   USERS,
   filterTransactions,
 } from "@/lib/transactions-data";
+import { CURRENT_USER } from "@/lib/current-user";
 import type {
   JournalStatus,
   Transaction,
@@ -83,7 +84,7 @@ export function TransactionsClient() {
   const [filter, setFilter] = React.useState<TransactionFilter>(
     DEFAULT_FILTER,
   );
-  const [view, setView] = React.useState<View>("table");
+  const [view, setView] = React.useState<View>("kanban");
   const [selectedId, setSelectedId] = React.useState<string | null>(null);
   const [detailOpen, setDetailOpen] = React.useState(false);
   const [createOpen, setCreateOpen] = React.useState(false);
@@ -136,6 +137,113 @@ export function TransactionsClient() {
         description: `${id} → ${JOURNAL_STATUS_LABEL[js]}`,
         variant: "success",
       });
+  };
+
+  /**
+   * 承認アクション。pending→approved/rejected に更新し、history に記録。
+   * 「return（差戻し）」は API 上は rejected と同じステータス値だが、history と取引ステータスで区別する。
+   */
+  const handleApprovalAction = (
+    txnId: string,
+    stepId: string,
+    action: "approve" | "return" | "reject",
+    comment: string,
+  ) => {
+    const now = new Date().toISOString();
+    const actionLabel =
+      action === "approve"
+        ? "承認"
+        : action === "return"
+          ? "差戻し"
+          : "却下";
+    setList((prev) =>
+      prev.map((t) => {
+        if (t.id !== txnId) return t;
+        const approvals = t.approvals.map((s) =>
+          s.id === stepId
+            ? {
+                ...s,
+                status:
+                  action === "approve"
+                    ? ("approved" as const)
+                    : ("rejected" as const),
+                acted_at: now,
+                comment: comment || s.comment,
+              }
+            : s,
+        );
+        const nextStatus: TransactionStatus =
+          action === "reject"
+            ? "rejected"
+            : action === "return"
+              ? "review"
+              : approvals.every(
+                    (s) => s.status === "approved" || s.status === "skipped",
+                  )
+                ? "done"
+                : t.status;
+        return {
+          ...t,
+          approvals,
+          status: nextStatus,
+          history: [
+            ...t.history,
+            {
+              id: `H-${txnId}-${Date.now()}`,
+              actor: CURRENT_USER,
+              action: actionLabel,
+              at: now,
+              detail: comment || null,
+            },
+          ],
+          updated_at: now,
+        };
+      }),
+    );
+    toast({
+      title: `${actionLabel}しました`,
+      description: `${txnId} ・ ${stepId}`,
+      variant:
+        action === "approve"
+          ? "success"
+          : action === "return"
+            ? "warning"
+            : "error",
+    });
+  };
+
+  /** 取引へのコメント追加（drawer から） */
+  const handleAddComment = (id: string, body: string) => {
+    const now = new Date().toISOString();
+    setList((prev) =>
+      prev.map((t) =>
+        t.id === id
+          ? {
+              ...t,
+              comments: [
+                ...t.comments,
+                {
+                  id: `TC-${id}-${Date.now()}`,
+                  author: CURRENT_USER,
+                  body,
+                  created_at: now,
+                },
+              ],
+              history: [
+                ...t.history,
+                {
+                  id: `H-${id}-${Date.now()}`,
+                  actor: CURRENT_USER,
+                  action: "コメント追加",
+                  at: now,
+                  detail: body.slice(0, 60),
+                },
+              ],
+              updated_at: now,
+            }
+          : t,
+      ),
+    );
   };
 
   const handleCreate = (d: TransactionDraft) => {
@@ -226,6 +334,8 @@ export function TransactionsClient() {
           setDetailOpen(o);
           if (!o) setSelectedId(null);
         }}
+        onAddComment={handleAddComment}
+        onApprovalAction={handleApprovalAction}
       />
 
       <TransactionCreateDrawer

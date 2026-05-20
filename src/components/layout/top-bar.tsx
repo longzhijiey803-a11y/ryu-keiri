@@ -1,29 +1,14 @@
 "use client";
 
 import Link from "next/link";
-import {
-  Bell,
-  ChevronDown,
-  CircleHelp,
-  LogOut,
-  PanelLeft,
-  Search,
-  Settings,
-  UserRound,
-} from "lucide-react";
+import { PanelLeft, Search, Settings } from "lucide-react";
 
 import { cn } from "@/lib/utils";
-import {
-  Avatar,
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui";
+import { HelpDropdown } from "./help-dropdown";
+import { NotificationsDropdown } from "./notifications-dropdown";
+import { UserMenuDropdown, type UserMenuUser } from "./user-menu-dropdown";
 
-const CURRENT_USER = {
+const CURRENT_USER: UserMenuUser = {
   name: "経理 担当者",
   email: "keiri@example.co.jp",
   org: "竜之介ホールディングス",
@@ -81,84 +66,20 @@ export function TopBar({
       </div>
 
       <div className="ml-auto flex items-center gap-1">
-        <IconButton label="ヘルプ" className="hidden sm:inline-flex">
-          <CircleHelp className="size-[18px]" />
-        </IconButton>
+        <HelpDropdown className="hidden sm:inline-flex" />
 
-        {/* 通知 */}
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <button
-              type="button"
-              aria-label="通知"
-              title="通知"
-              className="relative inline-flex size-9 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-            >
-              <Bell className="size-[18px]" />
-              <span className="absolute right-1.5 top-1.5 size-2 rounded-full bg-danger ring-2 ring-surface" />
-            </button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent className="w-80">
-            <DropdownMenuLabel>通知</DropdownMenuLabel>
-            <DropdownMenuSeparator />
-            <div className="px-3 py-8 text-center text-sm text-muted-foreground">
-              通知機能は Step 4 以降で実装します
-            </div>
-          </DropdownMenuContent>
-        </DropdownMenu>
+        <NotificationsDropdown />
 
         <Link
           href="/settings"
           aria-label="設定"
           title="設定"
-          className="inline-flex size-9 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+          className="hidden size-9 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring sm:inline-flex"
         >
           <Settings className="size-[18px]" />
         </Link>
 
-        {/* ユーザーメニュー */}
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <button
-              type="button"
-              className="ml-1 flex items-center gap-2 rounded-md py-1 pl-1 pr-2 transition-colors hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-            >
-              <Avatar name={CURRENT_USER.name} />
-              <span className="hidden text-left sm:block">
-                <span className="block text-sm font-medium leading-tight text-foreground">
-                  {CURRENT_USER.name}
-                </span>
-                <span className="block text-xs leading-tight text-muted-foreground">
-                  {CURRENT_USER.org}
-                </span>
-              </span>
-              <ChevronDown className="size-4 text-muted-foreground" />
-            </button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent className="w-64">
-            <DropdownMenuLabel>
-              <span className="block text-sm font-medium text-foreground">
-                {CURRENT_USER.name}
-              </span>
-              <span className="block text-xs text-muted-foreground">
-                {CURRENT_USER.email}
-              </span>
-            </DropdownMenuLabel>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem disabled>
-              <UserRound /> プロフィール
-            </DropdownMenuItem>
-            <DropdownMenuItem asChild>
-              <Link href="/settings">
-                <Settings /> 設定
-              </Link>
-            </DropdownMenuItem>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem disabled>
-              <LogOut /> ログアウト
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
+        <UserMenuDropdown user={CURRENT_USER} />
       </div>
     </header>
   );

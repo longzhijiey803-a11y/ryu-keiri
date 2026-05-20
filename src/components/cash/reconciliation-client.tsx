@@ -1,7 +1,8 @@
 "use client";
 
 import * as React from "react";
-import { Check, CircleSlash, Link2 } from "lucide-react";
+import { useSearchParams } from "next/navigation";
+import { Check, CircleSlash, Link2, X } from "lucide-react";
 
 import { Button, EmptyState, useToast } from "@/components/ui";
 import { PageHeader } from "@/components/layout/page-header";
@@ -28,6 +29,14 @@ function MatchChip({ ok, label }: { ok: boolean; label: string }) {
 
 export function ReconciliationClient() {
   const { toast } = useToast();
+  const searchParams = useSearchParams();
+  // 請求書詳細の「銀行明細から手動で消し込む」から渡されるヒント
+  const hintInvoiceId = searchParams.get("invoice_id");
+  const hintAmount = Number(searchParams.get("amount") ?? "");
+  const [hintCleared, setHintCleared] = React.useState(false);
+  const filterHintActive =
+    !!hintInvoiceId && !hintCleared;
+
   const [list, setList] = React.useState<BankTxn[]>(BANK_TXNS);
   const [selectedId, setSelectedId] = React.useState<string | null>(null);
   const [pickedInvoice, setPickedInvoice] = React.useState<string | null>(
@@ -35,7 +44,18 @@ export function ReconciliationClient() {
   );
   const [reason, setReason] = React.useState("");
 
-  const targets = list.filter((t) => t.recon_status !== "reconciled");
+  // 全候補から推定一致する明細だけを先頭に出すための並び替え
+  const unsorted = list.filter((t) => t.recon_status !== "reconciled");
+  const targets = React.useMemo(() => {
+    if (!filterHintActive) return unsorted;
+    return [...unsorted].sort((a, b) => {
+      const ah = Number.isFinite(hintAmount) && txnAmount(a) === hintAmount;
+      const bh = Number.isFinite(hintAmount) && txnAmount(b) === hintAmount;
+      if (ah === bh) return 0;
+      return ah ? -1 : 1;
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [list, filterHintActive, hintAmount]);
   const selected = list.find((t) => t.id === selectedId) ?? null;
   const candidates: ReconCandidate[] = selected
     ? candidatesFor(selected)
@@ -83,6 +103,29 @@ export function ReconciliationClient() {
         description="入出金明細と請求書・取引を照合し、消込を実行します。"
       />
       <CashTabs />
+
+      {filterHintActive && (
+        <div className="mb-4 flex items-start justify-between gap-3 rounded-md border border-primary/30 bg-primary/[0.04] px-3 py-2.5 text-sm">
+          <div>
+            <p className="font-medium text-primary">
+              請求書 {hintInvoiceId} の消込候補を絞り込み中
+            </p>
+            <p className="text-xs text-muted-foreground">
+              {Number.isFinite(hintAmount) && hintAmount > 0
+                ? `${formatJPY(hintAmount)} と一致する明細を先頭に表示しています。`
+                : "請求書に紐づく明細を先頭に表示しています。"}
+            </p>
+          </div>
+          <button
+            type="button"
+            onClick={() => setHintCleared(true)}
+            aria-label="ヒントを閉じる"
+            className="rounded p-1 text-muted-foreground hover:text-foreground"
+          >
+            <X className="size-4" />
+          </button>
+        </div>
+      )}
 
       <div className="grid gap-4 lg:grid-cols-2">
         {/* 左: 入出金明細 */}

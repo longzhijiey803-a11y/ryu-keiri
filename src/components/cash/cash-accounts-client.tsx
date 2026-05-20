@@ -16,6 +16,7 @@ import {
 } from "@/lib/types/bank";
 import { CashTabs } from "./cash-tabs";
 import { AccountStatusBadge } from "./cash-badges";
+import { SyncBankButton } from "./sync-bank-button";
 
 export function CashAccountsClient() {
   const { toast } = useToast();
@@ -44,9 +45,11 @@ export function CashAccountsClient() {
             <Button variant="outline" disabled title="CSV取込は今後実装">
               <Upload /> CSVインポート
             </Button>
-            <Button variant="outline" disabled title="銀行API連携は今後実装">
-              <RefreshCw /> 口座を同期
-            </Button>
+            <SyncBankButton
+              accounts={accounts}
+              onSynced={(updated) => setAccounts(updated)}
+              variant="primary"
+            />
           </>
         }
       />

@@ -37,6 +37,8 @@ export const EXPENSE_CLAIMS: ExpenseClaim[] = [
     applicant_id: "u2",
     department: "営業部",
     claim_date: "2026-05-12",
+    approval_due_date: "2026-05-19",
+    settlement_due_date: "2026-05-25",
     status: "pending_approval",
     pay_state: "unpaid",
     lines: [
@@ -68,6 +70,8 @@ export const EXPENSE_CLAIMS: ExpenseClaim[] = [
     applicant_id: "u4",
     department: "開発部",
     claim_date: "2026-05-10",
+    approval_due_date: "2026-05-17",
+    settlement_due_date: "2026-05-25",
     status: "returned",
     pay_state: "unpaid",
     lines: [
@@ -94,6 +98,8 @@ export const EXPENSE_CLAIMS: ExpenseClaim[] = [
     applicant_id: "u4",
     department: "開発部",
     claim_date: "2026-05-07",
+    approval_due_date: "2026-05-14",
+    settlement_due_date: "2026-05-25",
     status: "approved",
     pay_state: "scheduled",
     lines: [
@@ -121,6 +127,8 @@ export const EXPENSE_CLAIMS: ExpenseClaim[] = [
     applicant_id: "u2",
     department: "営業部",
     claim_date: "2026-05-06",
+    approval_due_date: "2026-05-13",
+    settlement_due_date: "2026-05-15",
     status: "settled",
     pay_state: "settled",
     lines: [
@@ -147,6 +155,8 @@ export const EXPENSE_CLAIMS: ExpenseClaim[] = [
     applicant_id: "u4",
     department: "開発部",
     claim_date: "2026-05-15",
+    approval_due_date: "2026-05-22",
+    settlement_due_date: "2026-05-25",
     status: "submitted",
     pay_state: "unpaid",
     lines: [
@@ -172,6 +182,8 @@ export const EXPENSE_CLAIMS: ExpenseClaim[] = [
     applicant_id: "u2",
     department: "営業部",
     claim_date: "2026-05-16",
+    approval_due_date: "2026-05-23",
+    settlement_due_date: "2026-05-25",
     status: "draft",
     pay_state: "unpaid",
     lines: [
@@ -193,6 +205,8 @@ export const EXPENSE_CLAIMS: ExpenseClaim[] = [
     applicant_id: "u5",
     department: "管理部",
     claim_date: "2026-05-14",
+    approval_due_date: "2026-05-21",
+    settlement_due_date: "2026-05-25",
     status: "pending_approval",
     pay_state: "unpaid",
     lines: [
@@ -218,6 +232,8 @@ export const EXPENSE_CLAIMS: ExpenseClaim[] = [
     applicant_id: "u4",
     department: "開発部",
     claim_date: "2026-05-11",
+    approval_due_date: "2026-05-18",
+    settlement_due_date: "2026-05-25",
     status: "rejected",
     pay_state: "unpaid",
     lines: [
@@ -246,6 +262,8 @@ export const EXPENSE_CLAIMS: ExpenseClaim[] = [
     applicant_id: "u1",
     department: "管理部",
     claim_date: "2026-05-17",
+    approval_due_date: "2026-05-24",
+    settlement_due_date: "2026-05-25",
     status: "scheduled",
     pay_state: "scheduled",
     lines: [
