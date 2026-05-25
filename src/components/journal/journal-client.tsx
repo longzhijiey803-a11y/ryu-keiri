@@ -4,6 +4,10 @@ import * as React from "react";
 import { Download, Plus, Upload } from "lucide-react";
 
 import { Button, useToast } from "@/components/ui";
+import {
+  UNIMPLEMENTED_TITLE,
+  UnimplementedBadge,
+} from "@/components/ui/unimplemented-badge";
 import { PageHeader } from "@/components/layout/page-header";
 import {
   JOURNAL_ENTRIES,
@@ -221,11 +225,11 @@ export function JournalClient() {
         description="取引を会計データとして記録し、勘定科目・税区分・部門・プロジェクト別に管理します。"
         actions={
           <>
-            <Button variant="outline" disabled title="Step 後続で実装">
-              <Upload /> インポート
+            <Button variant="outline" disabled title={UNIMPLEMENTED_TITLE}>
+              <Upload /> インポート <UnimplementedBadge />
             </Button>
-            <Button variant="outline" disabled title="Step 後続で実装">
-              <Download /> エクスポート
+            <Button variant="outline" disabled title={UNIMPLEMENTED_TITLE}>
+              <Download /> エクスポート <UnimplementedBadge />
             </Button>
             <Button onClick={() => setCreateOpen(true)}>
               <Plus /> 新規仕訳

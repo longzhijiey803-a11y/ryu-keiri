@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -18,6 +18,7 @@ import {
   Input,
   Label,
 } from "@/components/ui";
+import { setAuthCookie } from "@/lib/auth";
 import { cn } from "@/lib/utils";
 
 /**
@@ -65,6 +66,7 @@ export function LoginForm({
   className,
 }: LoginFormProps) {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [submitError, setSubmitError] = React.useState<string | null>(null);
 
   const {
@@ -89,7 +91,11 @@ export function LoginForm({
     setSubmitError(null);
     try {
       await (onSubmit ?? mockAuthenticate)(values);
-      router.push(redirectTo);
+      setAuthCookie();
+      const next = searchParams?.get("redirect");
+      const target =
+        next && next.startsWith("/") && !next.startsWith("//") ? next : redirectTo;
+      router.replace(target);
     } catch (e) {
       const msg =
         e instanceof Error ? e.message : "ログインに失敗しました。時間をおいて再度お試しください。";

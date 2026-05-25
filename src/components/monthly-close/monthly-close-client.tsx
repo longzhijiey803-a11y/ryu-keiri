@@ -73,9 +73,10 @@ export function MonthlyCloseClient() {
             title={closeable ? "" : "全工程の完了が必要です"}
             onClick={() =>
               toast({
-                title: `${CLOSE_PERIOD} を締めました（デモ）`,
-                description: "実際のロックは Supabase 接続後に実装します。",
-                variant: "success",
+                title: "月次ロックは未実装です",
+                description:
+                  "ロック処理（過去月の読み取り専用化）はバックエンド接続後に実装します。",
+                variant: "warning",
               })
             }
           >

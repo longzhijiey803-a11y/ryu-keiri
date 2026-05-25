@@ -4,6 +4,7 @@ import * as React from "react";
 import { RefreshCw } from "lucide-react";
 
 import { Button, useToast } from "@/components/ui";
+import { SampleBadge } from "@/components/ui/unimplemented-badge";
 import type { BankAccount } from "@/lib/types/bank";
 
 /** 同期結果（成功時は更新後の口座リストを返す） */
@@ -89,13 +90,13 @@ export function SyncBankButton({
       if (result.ok) {
         onSynced?.(result.accounts);
         toast({
-          title: "口座を同期しました",
-          description: `${result.accounts.length} 件の口座を更新しました。`,
-          variant: "success",
+          title: "サンプル同期を実行しました",
+          description: `${result.accounts.length} 件の口座にダミーの残高を反映しました。実 API には未接続です。`,
+          variant: "warning",
         });
       } else {
         toast({
-          title: "同期に失敗しました",
+          title: "サンプル同期に失敗しました",
           description: result.error,
           variant: "error",
         });
@@ -124,6 +125,7 @@ export function SyncBankButton({
       disabled={disabled}
       aria-busy={loading}
       aria-label={label}
+      title="実銀行 API には未接続のため、サンプルの結果が返ります。"
       onClick={handleClick}
       className={className}
     >
@@ -133,6 +135,7 @@ export function SyncBankButton({
         <>
           <RefreshCw />
           {label}
+          <SampleBadge />
         </>
       )}
     </Button>

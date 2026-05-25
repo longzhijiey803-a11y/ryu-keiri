@@ -27,10 +27,17 @@ export function TransactionCard({
   onStatusChange?: (id: string, status: TransactionStatus) => void;
 }) {
   return (
-    <button
-      type="button"
+    <div
+      role="button"
+      tabIndex={0}
       onClick={() => onClick(txn)}
-      className="w-full rounded-lg border border-border bg-surface p-3 text-left shadow-card transition-colors hover:border-primary/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+      onKeyDown={(e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          onClick(txn);
+        }
+      }}
+      className="w-full cursor-pointer rounded-lg border border-border bg-surface p-3 text-left shadow-card transition-colors hover:border-primary/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
     >
       <div className="flex items-start justify-between gap-2">
         <p className="line-clamp-2 text-sm font-medium text-foreground">
@@ -98,6 +105,6 @@ export function TransactionCard({
           <Avatar name={txn.assignee.name} size="sm" />
         </div>
       </div>
-    </button>
+    </div>
   );
 }

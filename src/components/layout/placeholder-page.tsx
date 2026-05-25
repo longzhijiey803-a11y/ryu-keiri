@@ -4,10 +4,14 @@ import { usePathname } from "next/navigation";
 import { Construction, Plus } from "lucide-react";
 
 import { Button } from "@/components/ui";
+import {
+  UNIMPLEMENTED_TITLE,
+  UnimplementedBadge,
+} from "@/components/ui/unimplemented-badge";
 import { findNavItem } from "@/lib/nav";
 import { PageHeader } from "./page-header";
 
-/** ルートごとの説明と主アクション（骨格用。中身は Step 4 以降）。 */
+/** ルートごとの説明と主アクション（プレースホルダ画面用）。 */
 const META: Record<string, { description: string; action?: string }> = {
   "/": { description: "経理業務のホーム。よく使う導線と当日のタスクをまとめます。" },
   "/dashboard": { description: "KPI・アラート・承認待ちを俯瞰するロール別ダッシュボード。" },
@@ -40,8 +44,8 @@ export function PlaceholderPage() {
         description={meta.description}
         actions={
           meta.action ? (
-            <Button disabled title="Step 4 以降で実装">
-              <Plus /> {meta.action}
+            <Button disabled title={UNIMPLEMENTED_TITLE}>
+              <Plus /> {meta.action} <UnimplementedBadge />
             </Button>
           ) : undefined
         }
@@ -56,8 +60,7 @@ export function PlaceholderPage() {
             「{title}」は準備中です
           </h2>
           <p className="mt-1.5 text-sm text-muted-foreground">
-            このページは共通レイアウトの確認用プレースホルダーです。画面の中身は
-            Step 4 以降で、Step 2 のデザイン部品を使って実装します。
+            この画面は準備中です。今後のアップデートで実装されます。
           </p>
         </div>
       </div>

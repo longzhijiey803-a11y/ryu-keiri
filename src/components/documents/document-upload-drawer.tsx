@@ -20,6 +20,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui";
+import { UnimplementedBadge } from "@/components/ui/unimplemented-badge";
 import { cn } from "@/lib/utils";
 import {
   DOCUMENT_TYPES,
@@ -150,11 +151,12 @@ export function DocumentUploadDrawer({
                 <ScanLine className="size-4" />
               </span>
               <div>
-                <p className="text-sm font-medium text-foreground">
-                  OCR 自動読み取り（今後連携）
+                <p className="flex items-center gap-1.5 text-sm font-medium text-foreground">
+                  OCR 自動読み取り
+                  <UnimplementedBadge />
                 </p>
                 <p className="text-xs text-muted-foreground">
-                  アップロード後、取引先・金額・日付・登録番号を自動抽出予定。現在は手入力してください。
+                  実装後はアップロード時に取引先・金額・日付・登録番号を自動抽出します。現在は手入力してください。
                 </p>
               </div>
             </div>

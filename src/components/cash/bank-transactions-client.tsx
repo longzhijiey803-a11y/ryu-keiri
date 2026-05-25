@@ -4,6 +4,10 @@ import * as React from "react";
 import { Upload } from "lucide-react";
 
 import { Button } from "@/components/ui";
+import {
+  UNIMPLEMENTED_TITLE,
+  UnimplementedBadge,
+} from "@/components/ui/unimplemented-badge";
 import { PageHeader } from "@/components/layout/page-header";
 import { BANK_TXNS, filterBankTxns } from "@/lib/bank-data";
 import type { BankTxnFilter } from "@/lib/types/bank";
@@ -31,8 +35,8 @@ export function BankTransactionsClient() {
         title="入出金管理"
         description="銀行明細を取り込み、請求書・取引と照合（消込）します。"
         actions={
-          <Button variant="outline" disabled title="CSV取込は今後実装">
-            <Upload /> CSVインポート
+          <Button variant="outline" disabled title={UNIMPLEMENTED_TITLE}>
+            <Upload /> CSVインポート <UnimplementedBadge />
           </Button>
         }
       />

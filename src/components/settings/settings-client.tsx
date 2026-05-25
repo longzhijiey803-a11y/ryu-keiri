@@ -114,9 +114,10 @@ export function SettingsClient() {
   const [sec, setSec] = React.useState<Sec>("company");
   const saved = () =>
     toast({
-      title: "設定を保存しました（デモ）",
-      description: "実際の保存は Supabase 接続後に有効化します。",
-      variant: "success",
+      title: "保存処理は未実装です",
+      description:
+        "現在の画面入力は保存されません。バックエンド接続後に有効化します。",
+      variant: "warning",
     });
 
   // 担当者管理（セッション内のデモ。実保存は Supabase 接続後）
@@ -337,7 +338,7 @@ export function SettingsClient() {
                 </div>
               </div>
               <p className="mt-3 rounded-md bg-muted px-3 py-2 text-xs text-muted-foreground">
-                ※ 受領請求書の登録番号照合・自動チェックは今後実装します。
+                ※ 登録番号の自動照合機能は現在ご利用いただけません。
               </p>
               <div className="mt-5 flex justify-end">
                 <Button onClick={saved}>保存</Button>
@@ -352,20 +353,12 @@ export function SettingsClient() {
               </div>
               <div className="max-h-[520px] overflow-y-auto scrollbar-thin">
                 <table className="w-full text-sm">
-                  <thead className="sticky top-0 bg-muted/80">
-                    <tr className="text-xs text-muted-foreground">
-                      <th className="px-5 py-2 text-left font-medium">
-                        コード
-                      </th>
-                      <th className="px-3 py-2 text-left font-medium">
-                        科目名
-                      </th>
-                      <th className="px-3 py-2 text-left font-medium">
-                        区分
-                      </th>
-                      <th className="px-5 py-2 text-left font-medium">
-                        補助科目
-                      </th>
+                  <thead className="sticky top-0 bg-accent-rose text-white">
+                    <tr className="text-xs font-semibold">
+                      <th className="px-5 py-2 text-left">コード</th>
+                      <th className="px-3 py-2 text-left">科目名</th>
+                      <th className="px-3 py-2 text-left">区分</th>
+                      <th className="px-5 py-2 text-left">補助科目</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -502,7 +495,7 @@ export function SettingsClient() {
                 <div className="overflow-x-auto scrollbar-thin">
                   <table className="w-full text-sm">
                     <thead>
-                      <tr className="border-b border-border bg-muted/60 text-xs text-muted-foreground">
+                      <tr className="border-b border-white/15 bg-accent-rose text-xs font-semibold text-white [&_th]:!font-semibold [&_th]:!text-white">
                         <th className="px-5 py-2.5 text-left font-medium">
                           氏名
                         </th>
@@ -590,7 +583,7 @@ export function SettingsClient() {
             <Card>
               <table className="w-full text-sm">
                 <thead>
-                  <tr className="border-b border-border bg-muted/60 text-xs text-muted-foreground">
+                  <tr className="border-b border-white/15 bg-accent-rose text-xs font-semibold text-white [&_th]:!font-semibold [&_th]:!text-white">
                     <th className="px-5 py-2.5 text-left font-medium">
                       ロール
                     </th>
@@ -657,7 +650,7 @@ export function SettingsClient() {
                 ))}
               </ul>
               <p className="mt-3 rounded-md bg-muted px-3 py-2 text-xs text-muted-foreground">
-                ※ メール／Slack 等への通知連携は今後実装します。
+                ※ 外部通知（メール／Slack 等）への配信は現在ご利用いただけません。
               </p>
               <div className="mt-5 flex justify-end">
                 <Button onClick={saved}>保存</Button>

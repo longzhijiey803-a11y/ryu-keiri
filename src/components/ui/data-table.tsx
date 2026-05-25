@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import { usePathname } from "next/navigation";
 import {
   type ColumnDef,
   type RowData,
@@ -14,6 +15,7 @@ import {
 import { ArrowDown, ArrowUp, ChevronsUpDown } from "lucide-react";
 
 import { cn } from "@/lib/utils";
+import { TONE_BG, groupToneForPath } from "@/lib/nav";
 
 // 列メタ: 右寄せ（金額など）を列定義側から指定可能にする
 declare module "@tanstack/react-table" {
@@ -84,6 +86,9 @@ export function DataTable<TData>({
 
   const colCount = columns.length + (enableRowSelection ? 1 : 0);
 
+  const pathname = usePathname() ?? "";
+  const headerBg = TONE_BG[groupToneForPath(pathname)];
+
   return (
     <div className="overflow-hidden rounded-lg border border-border bg-surface shadow-card">
       {toolbar ? (
@@ -94,14 +99,19 @@ export function DataTable<TData>({
 
       <div className="overflow-auto scrollbar-thin">
         <table className="w-full border-collapse text-sm">
-          <thead className="sticky top-0 z-10 bg-muted [&_th]:border-b [&_th]:border-border">
+          <thead
+            className={cn(
+              "sticky top-0 z-10 text-white [&_th]:border-b [&_th]:border-white/15",
+              headerBg,
+            )}
+          >
             {table.getHeaderGroups().map((hg) => (
               <tr key={hg.id} className="h-table-head">
                 {enableRowSelection && (
                   <th className="w-10 px-3">
                     <input
                       type="checkbox"
-                      className="size-4 cursor-pointer accent-primary"
+                      className="size-4 cursor-pointer accent-white"
                       aria-label="すべて選択"
                       checked={table.getIsAllRowsSelected()}
                       ref={(el) => {
@@ -122,7 +132,7 @@ export function DataTable<TData>({
                     <th
                       key={header.id}
                       className={cn(
-                        "px-3 font-medium text-muted-foreground",
+                        "whitespace-nowrap px-3 font-semibold text-white",
                         alignClass(meta?.align),
                         meta?.headerClassName,
                       )}
@@ -132,7 +142,7 @@ export function DataTable<TData>({
                           type="button"
                           onClick={header.column.getToggleSortingHandler()}
                           className={cn(
-                            "inline-flex items-center gap-1 hover:text-foreground",
+                            "inline-flex items-center gap-1 text-white/90 hover:text-white",
                             meta?.align === "right" && "flex-row-reverse",
                           )}
                         >
@@ -145,7 +155,7 @@ export function DataTable<TData>({
                           ) : sorted === "desc" ? (
                             <ArrowDown className="size-3.5" />
                           ) : (
-                            <ChevronsUpDown className="size-3.5 opacity-50" />
+                            <ChevronsUpDown className="size-3.5 opacity-70" />
                           )}
                         </button>
                       ) : (

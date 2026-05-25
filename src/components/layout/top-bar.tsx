@@ -1,11 +1,15 @@
 "use client";
 
+import * as React from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { PanelLeft, Search, Settings } from "lucide-react";
 
+import { clearAuthCookie } from "@/lib/auth";
 import { cn } from "@/lib/utils";
 import { HelpDropdown } from "./help-dropdown";
 import { NotificationsDropdown } from "./notifications-dropdown";
+import { ThemeToggle } from "./theme-toggle";
 import { UserMenuDropdown, type UserMenuUser } from "./user-menu-dropdown";
 
 const CURRENT_USER: UserMenuUser = {
@@ -43,6 +47,12 @@ export function TopBar({
   collapsed: boolean;
   onToggleSidebar: () => void;
 }) {
+  const router = useRouter();
+  const handleLogout = React.useCallback(() => {
+    clearAuthCookie();
+    router.replace("/login");
+  }, [router]);
+
   return (
     <header className="sticky top-0 z-20 flex h-topbar shrink-0 items-center gap-3 border-b border-border bg-surface px-4">
       <IconButton
@@ -66,6 +76,8 @@ export function TopBar({
       </div>
 
       <div className="ml-auto flex items-center gap-1">
+        <ThemeToggle />
+
         <HelpDropdown className="hidden sm:inline-flex" />
 
         <NotificationsDropdown />
@@ -79,7 +91,7 @@ export function TopBar({
           <Settings className="size-[18px]" />
         </Link>
 
-        <UserMenuDropdown user={CURRENT_USER} />
+        <UserMenuDropdown user={CURRENT_USER} onLogout={handleLogout} />
       </div>
     </header>
   );

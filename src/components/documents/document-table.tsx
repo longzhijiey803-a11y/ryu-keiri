@@ -105,7 +105,7 @@ function buildColumns(
     accessorFn: (d) => d.related_transaction_id ?? "",
     cell: ({ row }) =>
       row.original.related_transaction_id ? (
-        <span className="inline-flex items-center gap-1 tabular text-muted-foreground">
+        <span className="inline-flex items-center gap-1 whitespace-nowrap tabular text-muted-foreground">
           <Link2 className="size-3.5" />
           {row.original.related_transaction_id}
         </span>
@@ -119,7 +119,7 @@ function buildColumns(
     accessorFn: (d) => d.related_journal_id ?? "",
     cell: ({ row }) =>
       row.original.related_journal_id ? (
-        <span className="inline-flex items-center gap-1 tabular text-muted-foreground">
+        <span className="inline-flex items-center gap-1 whitespace-nowrap tabular text-muted-foreground">
           <Link2 className="size-3.5" />
           {row.original.related_journal_id}
         </span>

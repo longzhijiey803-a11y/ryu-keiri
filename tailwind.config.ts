@@ -38,17 +38,26 @@ const config: Config = {
           foreground: "rgb(var(--sidebar-foreground) / <alpha-value>)",
           active: "rgb(var(--sidebar-active) / <alpha-value>)", // #3A3D45
         },
-        // ステータス色のみ意味を持たせる（§A-4 / 方針）
-        success: "rgb(var(--success) / <alpha-value>)", // #16A34A
-        warning: "rgb(var(--warning) / <alpha-value>)", // #D97706
-        danger: "rgb(var(--danger) / <alpha-value>)", // #DC2626
-        info: "rgb(var(--info) / <alpha-value>)", // #2563EB
+        // ステータス色（16案テーマで emerald/amber/rose に再マッピング）
+        success: "rgb(var(--success) / <alpha-value>)", // emerald-500
+        warning: "rgb(var(--warning) / <alpha-value>)", // amber-500
+        danger: "rgb(var(--danger) / <alpha-value>)", // rose-500
+        info: "rgb(var(--info) / <alpha-value>)", // indigo-500
+        // 16案 KPI/タイル用アクセント
+        accent: {
+          indigo: "rgb(var(--accent-indigo) / <alpha-value>)",
+          emerald: "rgb(var(--accent-emerald) / <alpha-value>)",
+          amber: "rgb(var(--accent-amber) / <alpha-value>)",
+          rose: "rgb(var(--accent-rose) / <alpha-value>)",
+          fuchsia: "rgb(var(--accent-fuchsia) / <alpha-value>)",
+        },
       },
       borderRadius: {
         sm: "6px",
-        md: "8px", // 入力・ボタン
-        lg: "12px", // カード（§A-5）
-        xl: "16px",
+        md: "10px", // 入力・ボタン（少し丸めに）
+        lg: "14px", // カード：16案の rounded-2xl 寄りへ
+        xl: "18px",
+        "2xl": "22px",
       },
       spacing: {
         // 8px グリッド補助トークン（§A-5）

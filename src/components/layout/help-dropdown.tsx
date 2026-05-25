@@ -5,10 +5,7 @@ import {
   ArrowUpRight,
   BookOpen,
   HelpCircle,
-  Keyboard,
   LifeBuoy,
-  Lightbulb,
-  MessageCircleQuestion,
 } from "lucide-react";
 
 import { cn } from "@/lib/utils";
@@ -29,7 +26,7 @@ interface HelpLink {
   hint?: string;
 }
 
-/** 表示するヘルプリンク。将来は FAQ / チュートリアル / Slack 連携などに差し替え。 */
+/** 表示するヘルプリンク。 */
 const HELP_LINKS: HelpLink[] = [
   {
     label: "クイックスタートガイド",
@@ -38,25 +35,10 @@ const HELP_LINKS: HelpLink[] = [
     hint: "主要画面と業務フローの最短ルート",
   },
   {
-    label: "よくある質問（FAQ）",
-    icon: MessageCircleQuestion,
-    hint: "公開準備中",
-  },
-  {
-    label: "キーボードショートカット",
-    icon: Keyboard,
-    hint: "⌘K で検索 / Esc で閉じる",
-  },
-  {
-    label: "ヒント・Tips",
-    icon: Lightbulb,
-    hint: "AI 推測・自動仕訳の使い方",
-  },
-  {
-    label: "サポートに問い合わせる",
+    label: "お問い合わせ",
     icon: LifeBuoy,
-    external: true,
-    hint: "support@example.co.jp",
+    href: "/contact",
+    hint: "サポートチームへ質問・要望を送る",
   },
 ];
 
@@ -147,7 +129,7 @@ export function HelpDropdown({ className }: { className?: string }) {
 
         <DropdownMenuSeparator />
         <div className="px-4 py-2.5 text-[11px] text-muted-foreground">
-          バージョン v0.1.0（デモ）
+          バージョン v0.1.0
         </div>
       </DropdownMenuContent>
     </DropdownMenu>

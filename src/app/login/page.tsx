@@ -14,7 +14,7 @@ export default function LoginPage() {
         </div>
         <LoginForm />
         <p className="text-xs text-muted-foreground">
-          モック: <span className="font-mono">demo / demo</span> でログインできます
+          デモアカウント: <span className="font-mono">demo / demo</span>
         </p>
       </div>
     </main>

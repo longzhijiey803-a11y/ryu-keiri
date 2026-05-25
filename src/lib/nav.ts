@@ -7,7 +7,6 @@ import {
   FileText,
   HandCoins,
   History,
-  Home,
   Landmark,
   LayoutDashboard,
   NotebookPen,
@@ -39,8 +38,7 @@ export const NAV_GROUPS: NavGroup[] = [
   {
     title: "ホーム",
     items: [
-      { label: "ホーム", href: "/", icon: Home },
-      { label: "ダッシュボード", href: "/dashboard", icon: LayoutDashboard, placeholder: true },
+      { label: "ダッシュボード", href: "/dashboard", icon: LayoutDashboard },
     ],
   },
   {
@@ -87,3 +85,61 @@ export function findNavItem(pathname: string): NavItem | undefined {
   const matches = ALL_NAV_ITEMS.filter((i) => isNavActive(pathname, i.href));
   return matches.sort((a, b) => b.href.length - a.href.length)[0];
 }
+
+/**
+ * 16案テーマ：pathname に対応するサイドバーグループの色トーン（テーブルヘッダ等で利用）。
+ * 4 グループ: ホーム=indigo / 業務=emerald / 会計=amber / 管理=rose。
+ * 既定（マッチなし）と取引管理 (/transactions) はカラフルグラデを維持する。
+ */
+export type GroupTone =
+  | "indigo"
+  | "emerald"
+  | "amber"
+  | "rose"
+  | "rainbow";
+
+/**
+ * nav に直接出ていないサブルートの所属グループを補う。
+ * 例: `/cash` の入出金明細タブは `/bank-transactions` で別ルート。
+ */
+const EXTRA_GROUP_PREFIXES: { tone: GroupTone; prefixes: string[] }[] = [
+  {
+    tone: "emerald", // 業務
+    prefixes: ["/bank-transactions", "/reconciliation", "/payables", "/workflows"],
+  },
+];
+
+function startsWithAny(path: string, prefixes: string[]): boolean {
+  return prefixes.some((p) => path === p || path.startsWith(p + "/"));
+}
+
+export function groupToneForPath(pathname: string): GroupTone {
+  if (pathname === "/transactions" || pathname.startsWith("/transactions/")) {
+    return "rainbow"; // 取引管理は据え置き
+  }
+  for (const x of EXTRA_GROUP_PREFIXES) {
+    if (startsWithAny(pathname, x.prefixes)) return x.tone;
+  }
+  for (const g of NAV_GROUPS) {
+    const inGroup = g.items.some(
+      (it) =>
+        it.href !== "/" && isNavActive(pathname, it.href),
+    );
+    if (inGroup) {
+      if (g.title === "ホーム") return "indigo";
+      if (g.title === "業務") return "emerald";
+      if (g.title === "会計") return "amber";
+      if (g.title === "管理") return "rose";
+    }
+  }
+  return "rainbow";
+}
+
+/** GroupTone → Tailwind 背景クラス（テーブルヘッダ・帯用）。 */
+export const TONE_BG: Record<GroupTone, string> = {
+  indigo: "bg-accent-indigo",
+  emerald: "bg-accent-emerald",
+  amber: "bg-accent-amber",
+  rose: "bg-accent-rose",
+  rainbow: "bg-gradient-to-r from-accent-indigo via-accent-fuchsia to-accent-rose",
+};

@@ -28,6 +28,10 @@ import {
   TabsList,
   TabsTrigger,
 } from "@/components/ui";
+import {
+  UNIMPLEMENTED_TITLE,
+  UnimplementedBadge,
+} from "@/components/ui/unimplemented-badge";
 import { formatISODate, formatISODateTime, formatJPY } from "@/lib/utils";
 import { TAX_CATEGORY_LABEL } from "@/lib/types/transaction";
 import { TODAY, isOverdue, type Invoice, type Payment } from "@/lib/types/invoice";
@@ -371,8 +375,8 @@ export function InvoiceDetailDrawer({
           <DrawerClose asChild>
             <Button variant="secondary">閉じる</Button>
           </DrawerClose>
-          <Button disabled title="Step 後続で実装">
-            編集
+          <Button disabled title={UNIMPLEMENTED_TITLE}>
+            編集 <UnimplementedBadge />
           </Button>
         </DrawerFooter>
       </DrawerContent>

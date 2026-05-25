@@ -21,6 +21,11 @@ import {
   DrawerHeader,
   DrawerTitle,
 } from "@/components/ui";
+import {
+  SampleBadge,
+  UNIMPLEMENTED_TITLE,
+  UnimplementedBadge,
+} from "@/components/ui/unimplemented-badge";
 import { cn, formatISODate, formatISODateTime, formatJPY } from "@/lib/utils";
 import { isUnlinked, type Document } from "@/lib/types/document";
 import { DocumentStatusBadge, DocumentTypeBadge } from "./document-badges";
@@ -110,7 +115,7 @@ export function DocumentDetailDrawer({
                 <FileText className="size-10" />
               )}
               <p className="text-sm">
-                {isImg ? "画像" : "PDF"} プレビューは今後対応
+                {isImg ? "画像" : "PDF"} プレビュー非対応
               </p>
               <p className="tabular text-xs">{doc.storage_path}</p>
             </div>
@@ -120,8 +125,9 @@ export function DocumentDetailDrawer({
           <section>
             <div className="mb-2 flex items-center gap-2">
               <ScanLine className="size-4 text-primary" />
-              <h3 className="text-sm font-semibold text-foreground">
+              <h3 className="flex items-center gap-1.5 text-sm font-semibold text-foreground">
                 OCR 読み取り結果
+                <SampleBadge />
               </h3>
               {doc.ocr.status === "done" && doc.ocr.confidence != null && (
                 <Badge variant="info">信頼度 {doc.ocr.confidence}%</Badge>
@@ -159,13 +165,13 @@ export function DocumentDetailDrawer({
                   value={doc.ocr.registration_number}
                 />
                 <p className="mt-2 text-xs text-muted-foreground">
-                  ※ OCR連携は今後実装。現在は読み取り想定値の確認UIです。
+                  ※ 表示している値はサンプルです。実 OCR には未接続のため、確定保存は行えません。
                 </p>
               </div>
             ) : (
               <p className="rounded-md border border-dashed border-border bg-muted/40 px-3 py-6 text-center text-sm text-muted-foreground">
                 {doc.ocr.status === "pending"
-                  ? "OCR解析待ち（今後連携）"
+                  ? "OCR解析待ち（実 OCR は未接続）"
                   : "この証憑はOCR未実施です"}
               </p>
             )}
@@ -244,9 +250,9 @@ export function DocumentDetailDrawer({
                   variant="outline"
                   size="sm"
                   disabled
-                  title="Step 後続で実装"
+                  title={UNIMPLEMENTED_TITLE}
                 >
-                  取引／仕訳に紐づける
+                  取引／仕訳に紐づける <UnimplementedBadge />
                 </Button>
               )}
             </div>
@@ -257,8 +263,8 @@ export function DocumentDetailDrawer({
           <DrawerClose asChild>
             <Button variant="secondary">閉じる</Button>
           </DrawerClose>
-          <Button disabled title="Step 後続で実装">
-            編集
+          <Button disabled title={UNIMPLEMENTED_TITLE}>
+            編集 <UnimplementedBadge />
           </Button>
         </DrawerFooter>
       </DrawerContent>

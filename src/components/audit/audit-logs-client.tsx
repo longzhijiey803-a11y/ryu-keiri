@@ -150,8 +150,9 @@ export function AuditLogsClient() {
             variant="outline"
             onClick={() =>
               toast({
-                title: "監査ログをエクスポート（デモ）",
-                description: "CSV出力は実データ接続後に実装します。",
+                title: "エクスポートは未実装です",
+                description: "CSV出力はバックエンド接続後に実装します。",
+                variant: "warning",
               })
             }
           >

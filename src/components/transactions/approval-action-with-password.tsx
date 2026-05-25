@@ -198,12 +198,6 @@ function PasswordConfirmModal({
                   {error}
                 </p>
               )}
-              <p className="mt-1 text-[11px] text-muted-foreground">
-                デモ用パスワード：{" "}
-                <code className="rounded bg-muted px-1 tabular">
-                  {MOCK_APPROVAL_PASSWORD}
-                </code>
-              </p>
             </div>
 
             {action !== "approve" && (

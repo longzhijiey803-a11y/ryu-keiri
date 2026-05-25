@@ -4,6 +4,10 @@ import * as React from "react";
 import { Landmark, RefreshCw, Upload } from "lucide-react";
 
 import { Button, Card, EditableStatus, useToast } from "@/components/ui";
+import {
+  UNIMPLEMENTED_TITLE,
+  UnimplementedBadge,
+} from "@/components/ui/unimplemented-badge";
 import { PageHeader } from "@/components/layout/page-header";
 import { formatISODateTime, formatJPY } from "@/lib/utils";
 import { BANK_ACCOUNTS } from "@/lib/bank-data";
@@ -42,8 +46,8 @@ export function CashAccountsClient() {
         description="銀行口座・入出金明細を管理し、請求書や取引と照合します。"
         actions={
           <>
-            <Button variant="outline" disabled title="CSV取込は今後実装">
-              <Upload /> CSVインポート
+            <Button variant="outline" disabled title={UNIMPLEMENTED_TITLE}>
+              <Upload /> CSVインポート <UnimplementedBadge />
             </Button>
             <SyncBankButton
               accounts={accounts}
@@ -65,15 +69,15 @@ export function CashAccountsClient() {
       <div className="overflow-hidden rounded-lg border border-border bg-surface shadow-card">
         <table className="w-full text-sm">
           <thead>
-            <tr className="border-b border-border bg-muted/60 text-xs text-muted-foreground">
-              <th className="px-4 py-2.5 text-left font-medium">口座名</th>
-              <th className="px-3 py-2.5 text-left font-medium">金融機関</th>
-              <th className="px-3 py-2.5 text-left font-medium">支店</th>
-              <th className="px-3 py-2.5 text-left font-medium">種別</th>
-              <th className="px-3 py-2.5 text-left font-medium">口座番号</th>
-              <th className="px-3 py-2.5 text-right font-medium">残高</th>
-              <th className="px-3 py-2.5 text-left font-medium">最終同期</th>
-              <th className="px-3 py-2.5 text-left font-medium">状態</th>
+            <tr className="border-b border-white/15 bg-accent-emerald text-xs text-white">
+              <th className="px-4 py-2.5 text-left font-semibold">口座名</th>
+              <th className="px-3 py-2.5 text-left font-semibold">金融機関</th>
+              <th className="px-3 py-2.5 text-left font-semibold">支店</th>
+              <th className="px-3 py-2.5 text-left font-semibold">種別</th>
+              <th className="px-3 py-2.5 text-left font-semibold">口座番号</th>
+              <th className="px-3 py-2.5 text-right font-semibold">残高</th>
+              <th className="px-3 py-2.5 text-left font-semibold">最終同期</th>
+              <th className="px-3 py-2.5 text-left font-semibold">状態</th>
               <th className="px-4 py-2.5" />
             </tr>
           </thead>
@@ -123,9 +127,9 @@ export function CashAccountsClient() {
                     variant="ghost"
                     size="sm"
                     disabled
-                    title="銀行API連携は今後実装"
+                    title={UNIMPLEMENTED_TITLE}
                   >
-                    <RefreshCw /> 同期
+                    <RefreshCw /> 同期 <UnimplementedBadge />
                   </Button>
                 </td>
               </tr>

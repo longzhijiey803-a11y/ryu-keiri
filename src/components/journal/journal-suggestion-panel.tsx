@@ -3,6 +3,7 @@
 import { Check, Pencil, Sparkles } from "lucide-react";
 
 import { Button } from "@/components/ui";
+import { SampleBadge } from "@/components/ui/unimplemented-badge";
 import { cn } from "@/lib/utils";
 import { suggestJournal } from "@/lib/journal-data";
 import { TAX_CATEGORY_LABEL } from "@/lib/types/transaction";
@@ -32,11 +33,12 @@ export function JournalSuggestionPanel({
           <Sparkles className="size-4" />
         </span>
         <div>
-          <p className="text-sm font-semibold text-foreground">
+          <p className="flex items-center gap-1.5 text-sm font-semibold text-foreground">
             自動仕訳候補
+            <SampleBadge />
           </p>
           <p className="text-xs text-muted-foreground">
-            摘要・過去仕訳からのルール推定（AI連携は今後）
+            ルールベースのサンプル推定。実 AI には未接続です。
           </p>
         </div>
       </div>

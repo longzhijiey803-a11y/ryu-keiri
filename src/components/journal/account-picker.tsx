@@ -46,7 +46,7 @@ export function AccountPicker({
         <DropdownMenuTrigger asChild>
           <button
             type="button"
-            title={aiPredicted ? "AIが推測した勘定科目（クリックで修正）" : "勘定科目を変更"}
+            title={aiPredicted ? "AI推測（サンプル）。クリックで修正できます。" : "勘定科目を変更"}
             className={cn(
               "group inline-flex max-w-[200px] items-center gap-1 rounded text-left transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
               "hover:text-primary",
@@ -56,9 +56,9 @@ export function AccountPicker({
               <span className="inline-flex items-center gap-1 truncate">
                 <span
                   className="rounded bg-amber-100 px-1.5 py-0.5 text-[10px] font-medium text-amber-800"
-                  aria-label="AI推測"
+                  aria-label="AI推測（サンプル）"
                 >
-                  AI推測
+                  AI推測（サンプル）
                 </span>
                 <span className="truncate italic underline decoration-amber-500 decoration-dotted underline-offset-4">
                   {current}

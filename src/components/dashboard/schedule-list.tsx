@@ -32,18 +32,20 @@ export function ScheduleList({
     >
       <table className="w-full table-fixed border-collapse text-sm">
         <colgroup>
-          <col className="w-[34%]" />
-          <col className="w-[20%]" />
-          <col className="w-[22%]" />
-          <col className="w-[24%]" />
+          <col className="w-[280px]" />
+          <col className="w-[120px]" />
+          <col className="w-[140px]" />
+          <col className="w-[140px]" />
+          <col /> {/* 右側の余白を吸収するフィラー列：行/罫線/hover を全幅で揃える */}
         </colgroup>
 
         <thead className="sticky top-0 z-10 bg-surface shadow-[inset_0_-1px_0_rgb(var(--border))]">
           <tr className="text-xs text-muted-foreground">
             <th className="px-5 py-3 text-left font-medium">取引先</th>
             <th className="px-3 py-3 text-left font-medium">期日</th>
-            <th className="px-3 py-3 text-right font-medium">金額</th>
-            <th className="px-5 py-3 text-right font-medium">状態</th>
+            <th className="px-3 py-3 text-left font-medium">金額</th>
+            <th className="px-3 py-3 text-left font-medium">状態</th>
+            <th aria-hidden />
           </tr>
         </thead>
 
@@ -68,15 +70,14 @@ export function ScheduleList({
                   {r.dueDate}
                 </td>
                 <td
-                  className={`${border} whitespace-nowrap px-3 py-3.5 text-right tabular font-medium text-foreground`}
+                  className={`${border} whitespace-nowrap px-3 py-3.5 tabular font-medium text-foreground`}
                 >
                   {formatJPY(r.amount)}
                 </td>
-                <td className={`${border} px-5 py-3.5`}>
-                  <div className="flex items-center justify-end">
-                    <StatusBadge status={r.status} />
-                  </div>
+                <td className={`${border} px-3 py-3.5`}>
+                  <StatusBadge status={r.status} />
                 </td>
+                <td className={`${border} px-5 py-3.5`} aria-hidden />
               </tr>
             );
           })}

@@ -23,6 +23,10 @@ import {
   SelectValue,
   useToast,
 } from "@/components/ui";
+import {
+  UNIMPLEMENTED_TITLE,
+  UnimplementedBadge,
+} from "@/components/ui/unimplemented-badge";
 import { PageHeader } from "@/components/layout/page-header";
 import { cn, formatISODate, formatJPY } from "@/lib/utils";
 import {
@@ -173,8 +177,9 @@ export function FixedAssetsClient() {
           <Button
             onClick={() =>
               toast({
-                title: "資産登録（デモ）",
-                description: "登録フォームは実データ接続後に実装します。",
+                title: "資産登録は未実装です",
+                description: "登録フォームはバックエンド接続後に実装します。",
+                variant: "warning",
               })
             }
           >
@@ -324,8 +329,8 @@ export function FixedAssetsClient() {
                 <DrawerClose asChild>
                   <Button variant="secondary">閉じる</Button>
                 </DrawerClose>
-                <Button disabled title="Step 後続で実装">
-                  除却処理
+                <Button disabled title={UNIMPLEMENTED_TITLE}>
+                  除却処理 <UnimplementedBadge />
                 </Button>
               </DrawerFooter>
             </>

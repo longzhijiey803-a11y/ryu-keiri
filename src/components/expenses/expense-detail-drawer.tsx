@@ -288,7 +288,7 @@ export function ExpenseDetailDrawer({
                             <FileText className="size-8" />
                           )}
                           <p className="text-xs">
-                            プレビューは今後対応（{img ? "画像" : "PDF"}）
+                            {img ? "画像" : "PDF"} プレビュー非対応
                           </p>
                         </div>
                       </div>

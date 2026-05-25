@@ -27,6 +27,10 @@ import {
   TabsList,
   TabsTrigger,
 } from "@/components/ui";
+import {
+  UNIMPLEMENTED_TITLE,
+  UnimplementedBadge,
+} from "@/components/ui/unimplemented-badge";
 import { cn, formatISODate, formatISODateTime, formatJPY } from "@/lib/utils";
 import {
   JOURNAL_STATUS_LABEL,
@@ -290,7 +294,7 @@ export function TransactionDetailDrawer({
                 <EmptyState
                   icon={FileText}
                   title="未仕訳です"
-                  description="この取引から仕訳を生成します（Step 後続で実装）。"
+                  description="この取引にはまだ仕訳が紐づいていません。"
                   compact
                 />
               ) : (
@@ -447,8 +451,8 @@ export function TransactionDetailDrawer({
           <DrawerClose asChild>
             <Button variant="secondary">閉じる</Button>
           </DrawerClose>
-          <Button disabled title="Step 後続で実装">
-            編集
+          <Button disabled title={UNIMPLEMENTED_TITLE}>
+            編集 <UnimplementedBadge />
           </Button>
         </DrawerFooter>
       </DrawerContent>

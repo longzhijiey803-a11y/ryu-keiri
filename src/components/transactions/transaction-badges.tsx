@@ -9,27 +9,42 @@ import {
 
 /**
  * 取引ステータスバッジ。取引の7ステージ（「完了」を含む）専用。
- * 汎用 StatusBadge（docs/DESIGN.md §A-5 の13語彙固定）とは別物だが、
- * 同じトーン配色・ピル形状で見た目の一貫性を保つ。視認性重視。
+ * 16案テーマ：カンバン列ヘッダ色と完全一致させる（draft=zinc / review=indigo /
+ * approval=amber / scheduled_payment=rose / awaiting_deposit=fuchsia /
+ * done=emerald / rejected=zinc-darker）。
  */
-type Tone = "neutral" | "info" | "warning" | "success" | "danger";
-
-const STATUS_TONE: Record<TransactionStatus, Tone> = {
-  draft: "neutral",
-  review: "info",
-  approval: "warning",
-  scheduled_payment: "info",
-  awaiting_deposit: "warning",
-  done: "success",
-  rejected: "danger",
-};
-
-const TONE_CLASS: Record<Tone, { box: string; dot: string }> = {
-  neutral: { box: "bg-muted text-muted-foreground", dot: "bg-muted-foreground" },
-  info: { box: "bg-info/10 text-info", dot: "bg-info" },
-  warning: { box: "bg-warning/10 text-warning", dot: "bg-warning" },
-  success: { box: "bg-success/10 text-success", dot: "bg-success" },
-  danger: { box: "bg-danger/10 text-danger", dot: "bg-danger" },
+const STATUS_CLASS: Record<
+  TransactionStatus,
+  { box: string; dot: string }
+> = {
+  draft: {
+    box: "bg-zinc-600/15 text-zinc-700 dark:text-zinc-300",
+    dot: "bg-zinc-600",
+  },
+  review: {
+    box: "bg-accent-indigo/15 text-accent-indigo",
+    dot: "bg-accent-indigo",
+  },
+  approval: {
+    box: "bg-accent-amber/15 text-accent-amber",
+    dot: "bg-accent-amber",
+  },
+  scheduled_payment: {
+    box: "bg-accent-rose/15 text-accent-rose",
+    dot: "bg-accent-rose",
+  },
+  awaiting_deposit: {
+    box: "bg-accent-fuchsia/15 text-accent-fuchsia",
+    dot: "bg-accent-fuchsia",
+  },
+  done: {
+    box: "bg-accent-emerald/15 text-accent-emerald",
+    dot: "bg-accent-emerald",
+  },
+  rejected: {
+    box: "bg-zinc-700/15 text-zinc-700 dark:text-zinc-300",
+    dot: "bg-zinc-700",
+  },
 };
 
 export function TransactionStatusBadge({
@@ -39,7 +54,7 @@ export function TransactionStatusBadge({
   status: TransactionStatus;
   className?: string;
 }) {
-  const c = TONE_CLASS[STATUS_TONE[status]];
+  const c = STATUS_CLASS[status];
   return (
     <span
       className={cn(

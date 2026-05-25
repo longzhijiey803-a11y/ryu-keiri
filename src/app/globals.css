@@ -8,21 +8,29 @@
  * rgb(var(--x) / <alpha-value>) と連携する。現状はライトテーマ単一（業務SaaS / §A-0）。
  */
 :root {
-  --background: 246 247 249; /* #F6F7F9 アプリ背景 */
-  --surface: 255 255 255; /* #FFFFFF 面 */
-  --border: 229 231 235; /* #E5E7EB 罫線 */
-  --foreground: 17 24 39; /* #111827 本文 */
-  --muted: 243 244 246; /* #F3F4F6 弱い面 */
-  --muted-foreground: 107 114 128; /* #6B7280 補助テキスト */
-  --primary: 15 118 110; /* #0F766E */
+  /* フォレストテーマ（パレット案 07：フォレスト/リーフ/モス/ライム） */
+  --background: 246 250 244; /* #F6FAF4 緑みのある off-white */
+  --surface: 255 255 255;
+  --border: 215 224 200; /* #D7E0C8 ペールモス */
+  --foreground: 20 35 26; /* #14231A 深い森 */
+  --muted: 238 244 232; /* #EEF4E8 */
+  --muted-foreground: 88 105 70; /* くすみフォレスト */
+  --primary: 20 83 45; /* フォレスト #14532D（最も濃い色を主役に） */
   --primary-foreground: 255 255 255;
-  --sidebar: 36 39 46; /* #24272E ダークナビ */
-  --sidebar-foreground: 209 213 219; /* #D1D5DB */
-  --sidebar-active: 58 61 69; /* #3A3D45 */
-  --success: 22 163 74; /* #16A34A */
-  --warning: 217 119 6; /* #D97706 */
-  --danger: 220 38 38; /* #DC2626 */
-  --info: 37 99 235; /* #2563EB */
+  --sidebar: 238 244 232; /* 淡モス */
+  --sidebar-foreground: 20 35 26;
+  --sidebar-active: 215 224 200;
+  --success: 101 163 13; /* リーフ #65A30D */
+  --warning: 163 163 112; /* モス #A3A370 */
+  --danger: 180 83 9; /* テラコッタ #B45309（視認性のため対比色を借用） */
+  --info: 20 83 45; /* フォレスト */
+
+  /* アクセント（KPI／タイル／グループ帯） */
+  --accent-indigo: 20 83 45; /* フォレスト */
+  --accent-emerald: 101 163 13; /* リーフ */
+  --accent-amber: 163 163 112; /* モス */
+  --accent-rose: 132 204 22; /* ライム #84CC16 */
+  --accent-fuchsia: 180 83 9; /* テラコッタ */
 
   /* 日本語UIに適したフォント（実務向けで読みやすい / ビルド時ネットワーク非依存） */
   --font-sans: "Inter", -apple-system, BlinkMacSystemFont, "Hiragino Sans",
@@ -30,6 +38,37 @@
     Meiryo, system-ui, sans-serif;
   --font-mono: "SFMono-Regular", ui-monospace, Menlo, Consolas,
     "Liberation Mono", monospace;
+}
+
+/*
+ * ダークテーマ：html.dark のときに上書き。
+ * サイドバーも含めて全面ダーク化（surface・background・border・sidebar）。
+ * アクセント色は明暗どちらでも視認できるためそのまま維持。
+ */
+.dark {
+  /* フォレスト（ダーク版：深い森と苔の夜トーン＋明るいライム/葉色アクセント） */
+  --background: 10 20 16; /* 深い森 黒緑 */
+  --surface: 20 35 26; /* ダークフォレスト */
+  --border: 42 58 46;
+  --foreground: 232 239 224; /* 月光葉色 */
+  --muted: 20 35 26;
+  --muted-foreground: 152 168 138; /* 中明度モス */
+  --primary: 132 204 22; /* ライム（暗背景で主役） */
+  --primary-foreground: 10 20 16;
+  --sidebar: 10 20 16;
+  --sidebar-foreground: 200 212 181;
+  --sidebar-active: 42 58 46;
+  --success: 132 204 22; /* ライム */
+  --warning: 200 197 138; /* モス明 */
+  --danger: 224 136 80; /* 暖テラコッタ */
+  --info: 132 204 22;
+
+  /* 暗背景でも視認できるよう一段明るくしたアクセント */
+  --accent-indigo: 101 163 13; /* リーフ */
+  --accent-emerald: 132 204 22; /* ライム */
+  --accent-amber: 163 163 112; /* モス */
+  --accent-rose: 181 224 96; /* ライム明 */
+  --accent-fuchsia: 216 154 110; /* 暖テラコッタ */
 }
 
 @layer base {

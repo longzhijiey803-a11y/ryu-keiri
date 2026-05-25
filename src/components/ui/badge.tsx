@@ -8,7 +8,7 @@ import { cn } from "@/lib/utils";
  * 業務ステータス専用ラベルは status-badge.tsx を使う。
  */
 const badgeVariants = cva(
-  "inline-flex items-center gap-1.5 rounded-md border px-2 py-0.5 text-xs font-medium leading-none",
+  "inline-flex items-center gap-1.5 whitespace-nowrap rounded-md border px-2 py-0.5 text-xs font-medium leading-none",
   {
     variants: {
       variant: {

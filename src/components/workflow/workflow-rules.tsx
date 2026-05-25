@@ -17,6 +17,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui";
+import {
+  UNIMPLEMENTED_TITLE,
+  UnimplementedBadge,
+} from "@/components/ui/unimplemented-badge";
 import { PageHeader } from "@/components/layout/page-header";
 import { formatJPY } from "@/lib/utils";
 import { DEFAULT_RULE_SET, DEPARTMENTS } from "@/lib/workflow-data";
@@ -60,8 +64,8 @@ export function WorkflowRules() {
         title="承認ワークフロー"
         description="承認ルールを設定します（金額・部門・役職・経理確認・最終承認者）。"
         actions={
-          <Button disabled title="保存は今後実装">
-            設定を保存
+          <Button disabled title={UNIMPLEMENTED_TITLE}>
+            設定を保存 <UnimplementedBadge />
           </Button>
         }
       />
@@ -258,7 +262,7 @@ export function WorkflowRules() {
               />
             </div>
             <p className="rounded-md bg-muted px-3 py-2 text-xs text-muted-foreground">
-              ※ 設定の保存・実際の承認経路への反映は今後実装します（現在は設定UIのスケルトン）。
+              ※ 設定の保存および承認経路への反映は現在ご利用いただけません。
             </p>
           </CardContent>
         </Card>

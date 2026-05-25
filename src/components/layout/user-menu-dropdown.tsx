@@ -88,8 +88,10 @@ export function UserMenuDropdown({
           </div>
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
-        <DropdownMenuItem disabled>
-          <UserRound /> プロフィール
+        <DropdownMenuItem asChild>
+          <Link href="/profile">
+            <UserRound /> プロフィール
+          </Link>
         </DropdownMenuItem>
         <DropdownMenuItem asChild>
           <Link href="/settings">

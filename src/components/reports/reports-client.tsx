@@ -91,7 +91,7 @@ function AgingTable({ rows }: { rows: AgingRow[] }) {
     <div className="overflow-x-auto scrollbar-thin">
       <table className="w-full text-sm">
         <thead>
-          <tr className="border-b border-border bg-muted/60 text-xs text-muted-foreground">
+          <tr className="border-b border-white/15 bg-accent-amber text-xs font-semibold text-white [&_th]:!text-white">
             <th className="px-4 py-2.5 text-left font-medium">取引先</th>
             {cols.map(([l]) => (
               <th key={l} className="px-3 py-2.5 text-right font-medium">
@@ -149,8 +149,9 @@ export function ReportsClient() {
             variant="outline"
             onClick={() =>
               toast({
-                title: "エクスポートを開始しました（デモ）",
-                description: "CSV/PDF出力は実データ接続後に実装します。",
+                title: "エクスポートは未実装です",
+                description: "CSV/PDF出力はバックエンド接続後に実装します。",
+                variant: "warning",
               })
             }
           >
@@ -219,7 +220,7 @@ export function ReportsClient() {
         <Card>
           <table className="w-full text-sm">
             <thead>
-              <tr className="border-b border-border bg-muted/60 text-xs text-muted-foreground">
+              <tr className="border-b border-white/15 bg-accent-amber text-xs font-semibold text-white [&_th]:!text-white">
                 <th className="px-4 py-2.5 text-left font-medium">部門</th>
                 <th className="px-4 py-2.5 text-right font-medium">収益</th>
                 <th className="px-4 py-2.5 text-right font-medium">費用</th>

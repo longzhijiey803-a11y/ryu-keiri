@@ -2,7 +2,7 @@
 
 /**
  * デザインシステム プレビュー（業務画面ではない / ルート: /design-system）。
- * UI部品とトークンの目視確認用。業務画面は Step 3 以降で AppShell 上に構築する。
+ * UI部品とトークンの目視確認用プレビュー。
  */
 import * as React from "react";
 import type { ColumnDef } from "@tanstack/react-table";
@@ -109,13 +109,12 @@ export default function DesignSystemPreview() {
     <main className="min-h-screen bg-background">
       <div className="mx-auto max-w-5xl space-y-10 px-page py-10">
         <header>
-          <Badge variant="primary">Step 2 / デザイン基盤</Badge>
+          <Badge variant="primary">デザイン基盤</Badge>
           <h1 className="mt-2 text-3xl font-bold text-foreground">
             Ryu Keiri デザインシステム
           </h1>
           <p className="mt-1 text-sm text-muted-foreground">
-            UI部品・トークンの確認用プレビューです。業務画面は Step 3
-            以降で AppShell 上に同じ部品を使って構築します。
+            UI部品・トークンの確認用プレビューです。
           </p>
         </header>
 
@@ -264,7 +263,7 @@ export default function DesignSystemPreview() {
                   </div>
                   <p className="text-sm text-muted-foreground">
                     ヘッダー固定・本文スクロール・フッター固定の構造です。タブや証憑ビューを
-                    この本文に積み上げます（Step 3 以降）。
+                    この本文に積み上げて表示します。
                   </p>
                 </div>
               </DrawerBody>
